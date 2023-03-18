@@ -2,16 +2,27 @@
 
 mod vec3;
 mod ray;
+mod sphere;
 
 use vec3::{Vec3, RGBColor, Point3};
 use ray::Ray;
 use std::io::{stderr, Write};
 use std::thread::sleep;
 use std::time::Duration;
+use crate::sphere::Sphere;
 
 /// Blend white and blue depending on the y-coord
 ///
 fn ray_color(r: &Ray) -> RGBColor {
+    let sphere = Sphere::new(
+        Point3::new(0.0, 0.0, -1.0),
+        0.5,
+    );
+
+    if sphere.ray_collision(r) {
+        return RGBColor::new(1.0, 0.0, 0.0);
+    }
+
     // -1 <= x, y, z <= 1  ---  after normalizing
     let unit_dir = r.direction().normalized();
 
