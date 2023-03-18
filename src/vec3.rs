@@ -49,11 +49,13 @@ impl Vec3 {
     }
 }
 
+
 impl From<[f64; 3]> for Vec3 {
     fn from(e: [f64; 3]) -> Self {
         Self { vals: e }
     }
 }
+
 
 impl Index<usize> for Vec3 {
     type Output = f64;
@@ -68,6 +70,7 @@ impl IndexMut<usize> for Vec3 {
         &mut self.vals[index]
     }
 }
+
 
 impl Add for Vec3 {
     type Output = Vec3;
@@ -88,6 +91,7 @@ impl AddAssign for Vec3 {
     }
 }
 
+
 impl Sub for Vec3 {
     type Output = Vec3;
 
@@ -104,6 +108,7 @@ impl SubAssign for Vec3 {
         *self = added;
     }
 }
+
 
 impl Mul<f64> for Vec3 {
     type Output = Vec3;
@@ -129,6 +134,7 @@ impl Mul<Vec3> for Vec3 {
     }
 }
 
+
 impl Div<f64> for Vec3 {
     type Output = Vec3;
 
@@ -144,7 +150,6 @@ impl DivAssign<f64> for Vec3 {
         *self = *self / lambda
     }
 }
-
 
 impl Display for Vec3 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
