@@ -1,6 +1,7 @@
 #![feature(array_zip)]
 
 mod vec3;
+mod ray;
 
 use vec3::{Vec3, RGBColor};
 use std::io::{stderr, Write};
