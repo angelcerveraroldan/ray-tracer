@@ -38,6 +38,12 @@ impl Vec3 {
         }
     }
 
+    pub fn angle_between(&self, other: Vec3) -> f64 {
+        let d_product = self.dot(other);
+
+        (d_product / (self.magnitude() * other.magnitude())).acos()
+    }
+
     pub fn normalized(self) -> Vec3 { self / self.magnitude() }
 
     pub fn fmt_color(self) -> String {
@@ -160,6 +166,7 @@ impl Display for Vec3 {
 #[cfg(test)]
 mod test {
     use self::super::*;
+    use crate::utils::float_eq;
 
     const TESTING_VEC1: Vec3 = Vec3 { vals: [1.0, 3.0, 8.0] };
     const TESTING_VEC2: Vec3 = Vec3 { vals: [2.0, 2.0, 2.0] };
@@ -241,5 +248,16 @@ mod test {
         x.div_assign(0.5);
 
         assert_eq!(x, Vec3::new(6.0, 10.0, 20.0))
+    }
+
+    #[test]
+    fn angle_between() {
+        assert!(
+            float_eq(
+                TESTING_VEC1.angle_between(TESTING_VEC2),
+                0.63446780887552678418,
+                4,
+            )
+        );
     }
 }

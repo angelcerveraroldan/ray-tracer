@@ -3,6 +3,8 @@
 mod vec3;
 mod ray;
 mod sphere;
+mod utils;
+mod hit;
 
 use vec3::{Vec3, RGBColor, Point3};
 use ray::Ray;
@@ -13,18 +15,27 @@ use crate::sphere::Sphere;
 
 /// Blend white and blue depending on the y-coord
 ///
-fn ray_color(r: &Ray) -> RGBColor {
+fn ray_color(ray: &Ray) -> RGBColor {
     let sphere = Sphere::new(
         Point3::new(0.0, 0.0, -1.0),
         0.5,
     );
 
-    if sphere.ray_collision(r) {
-        return RGBColor::new(1.0, 0.0, 0.0);
+    let hit_time = sphere.ray_collision(ray);
+
+    if hit_time > 0.0 {
+        // The normal will be the line from the center to the point of impact
+        // This is the same as the point of impact of the ray relative to the center of the ball
+        let normal = (ray.at(hit_time) - sphere.center()).normalized();
+        return RGBColor::new(
+            normal.x() + 1.0,
+            normal.y() + 1.0,
+            normal.z() + 1.0,
+        ) * 0.5;
     }
 
     // -1 <= x, y, z <= 1  ---  after normalizing
-    let unit_dir = r.direction().normalized();
+    let unit_dir = ray.direction().normalized();
 
     // Add 1 to the y direction, now this is between 0 and 2, so multiply by 0.5
     let t = (unit_dir.y() + 1.0) * 0.5;
