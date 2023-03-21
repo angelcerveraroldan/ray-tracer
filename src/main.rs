@@ -9,8 +9,6 @@ mod hit;
 use vec3::{Vec3, RGBColor, Point3};
 use ray::Ray;
 use std::io::{stderr, Write};
-use std::thread::sleep;
-use std::time::Duration;
 use crate::sphere::Sphere;
 
 /// Blend white and blue depending on the y-coord
@@ -47,7 +45,7 @@ fn main() {
     // Image Setup
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u64 = 256;
-    const IMAGE_HEIGHT: u64 = ((256 as f64) / ASPECT_RATIO) as u64;
+    const IMAGE_HEIGHT: u64 = ((256_f64) / ASPECT_RATIO) as u64;
 
     // Camera Setup
     let viewport_height = 2.0;
@@ -62,11 +60,11 @@ fn main() {
 
 
     println!("P3");
-    println!("{} {}", IMAGE_WIDTH, IMAGE_HEIGHT);
+    println!("{IMAGE_WIDTH} {IMAGE_HEIGHT}");
     println!("255");
 
     for j in (0..IMAGE_HEIGHT).rev() {
-        eprint!("\rScanlines remaining: {:3}", j);
+        eprint!("\rScanlines remaining: {j:3}");
         stderr().flush().unwrap();
 
         for i in 0..IMAGE_WIDTH {
