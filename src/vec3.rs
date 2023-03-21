@@ -46,12 +46,12 @@ impl Vec3 {
 
     pub fn normalized(self) -> Vec3 { self / self.magnitude() }
 
-    pub fn fmt_color(self) -> String {
-        format!("{} {} {}",
-                (255.999 * self.x()) as u64,
-                (255.999 * self.y()) as u64,
-                (255.999 * self.z()) as u64
-        )
+    pub fn fmt_color(self, samples_pp: u64) -> String {
+        let r = (256.0 * (self.x() / (samples_pp as f64)).clamp(0.0, 0.999)) as u64;
+        let g = (256.0 * (self.y() / (samples_pp as f64)).clamp(0.0, 0.999)) as u64;
+        let b = (256.0 * (self.z() / (samples_pp as f64)).clamp(0.0, 0.999)) as u64;
+
+        format!("{} {} {}", r, g, b)
     }
 }
 

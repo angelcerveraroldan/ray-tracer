@@ -5,11 +5,14 @@ mod ray;
 mod sphere;
 mod utils;
 mod hit;
+mod camera;
 
 use vec3::{Vec3, RGBColor, Point3};
 use ray::Ray;
 use hit::{Hittable, ObjectsInWorld};
 use std::io::{stderr, Write};
+use rand::Rng;
+use crate::camera::Camera;
 use crate::sphere::Sphere;
 
 /// Blend white and blue depending on the y-coord
@@ -29,7 +32,8 @@ fn main() {
     // Image Setup
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u64 = 256;
-    const IMAGE_HEIGHT: u64 = ((256_f64) / ASPECT_RATIO) as u64;
+    const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
+    const SAMPLES_PP: u64 = 100;
 
     // World Setup
     let mut world: ObjectsInWorld = ObjectsInWorld::new();
@@ -37,61 +41,32 @@ fn main() {
     world.push(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
 
     // Camera Setup
-    let viewport_height = 2.0;
-    let viewport_width = ASPECT_RATIO * viewport_height;
-    let focal_length = 1.0;
-
-    let origin = Point3::new(0.0, 0.0, 0.0);
-    let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, viewport_height, 0.0);
-
-    /*
-        The origin is in the center of the "display", so to get the bottom left,
-        we need to go down and left by half of the width, and height
-
-        ***********************************************************
-        *                                                         *
-        *                                                         *
-        *                                                         *
-        *                                                         *
-        *                                                         *
-        *                                                         *
-        *                                                         *
-        *                         origin                          * ^
-        *                                                         * |
-        *                                                         * |
-        *                                                         * height / 2
-        *                                                         * |
-        *                                                         * |
-        *                                                         * |
-        *********************************************************** v
-        ^ --------width / 2-------- ^
-
-     */
-    let lower_left_corner =
-        origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, focal_length);
-
+    let camera = Camera::new();
 
     println!("P3");
     println!("{IMAGE_WIDTH} {IMAGE_HEIGHT}");
     println!("255");
+
+    let mut range = rand::thread_rng();
 
     for y in (0..IMAGE_HEIGHT).rev() {
         eprint!("\rScanlines remaining: {y:3}");
         stderr().flush().unwrap();
 
         for x in 0..IMAGE_WIDTH {
-            let u = (x as f64) / ((IMAGE_WIDTH - 1) as f64);
-            let v = (y as f64) / ((IMAGE_HEIGHT - 1) as f64);
+            let mut pixel_color = RGBColor::new(0.0, 0.0, 0.0);
+            for _ in (0..SAMPLES_PP) {
+                let random_u: f64 = range.gen();
+                let random_v: f64 = range.gen();
 
-            let ray = Ray::new(
-                origin,
-                lower_left_corner + (horizontal * u) + (vertical * v) - origin,
-            );
+                let u = (x as f64 + random_u) / ((IMAGE_WIDTH - 1) as f64);
+                let v = (y as f64 + random_v) / ((IMAGE_HEIGHT - 1) as f64);
 
-            let pixel_color = ray_color(&ray, &world);
+                let ray = camera.get_ray(u, v);
+                pixel_color += ray_color(&ray, &world);
+            }
 
-            println!("{}", pixel_color.fmt_color());
+            println!("{}", pixel_color.fmt_color(SAMPLES_PP));
         }
     }
 
