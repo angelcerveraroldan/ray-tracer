@@ -55,6 +55,30 @@ fn main() {
     let origin = Point3::new(0.0, 0.0, 0.0);
     let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
     let vertical = Vec3::new(0.0, viewport_height, 0.0);
+
+    /*
+        The origin is in the center of the "display", so to get the bottom left,
+        we need to go down and left by half of the width, and height
+
+        ***********************************************************
+        *                                                         *
+        *                                                         *
+        *                                                         *
+        *                                                         *
+        *                                                         *
+        *                                                         *
+        *                                                         *
+        *                         origin                          * ^
+        *                                                         * |
+        *                                                         * |
+        *                                                         * height / 2
+        *                                                         * |
+        *                                                         * |
+        *                                                         * |
+        *********************************************************** v
+        ^ --------width / 2-------- ^
+
+     */
     let lower_left_corner =
         origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, focal_length);
 
@@ -63,13 +87,13 @@ fn main() {
     println!("{IMAGE_WIDTH} {IMAGE_HEIGHT}");
     println!("255");
 
-    for j in (0..IMAGE_HEIGHT).rev() {
-        eprint!("\rScanlines remaining: {j:3}");
+    for y in (0..IMAGE_HEIGHT).rev() {
+        eprint!("\rScanlines remaining: {y:3}");
         stderr().flush().unwrap();
 
-        for i in 0..IMAGE_WIDTH {
-            let u = (i as f64) / ((IMAGE_WIDTH - 1) as f64);
-            let v = (j as f64) / ((IMAGE_HEIGHT - 1) as f64);
+        for x in 0..IMAGE_WIDTH {
+            let u = (x as f64) / ((IMAGE_WIDTH - 1) as f64);
+            let v = (y as f64) / ((IMAGE_HEIGHT - 1) as f64);
 
             let ray = Ray::new(
                 origin,

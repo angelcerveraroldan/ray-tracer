@@ -59,17 +59,24 @@ impl Hit for Sphere {
             return None;
         }
 
+
+        // Now we find the SMALLEST time of impact
         let sqrtd = discriminant.sqrt();
         let mut root = (-half_b - sqrtd) / a;
 
         if root < t_min || t_max > root {
             root = (-half_b + sqrtd) / a;
             if root < t_min || t_max > root {
+                // The time of interception was too small or large (behind camera or behind another object)
                 return None;
             }
         }
 
         let point_of_impact = ray.at(root);
+        /*
+            This is always going to have a magnitude of rad, since the vector is from the center of
+            the sphere to a point in it's surface
+         */
         let normal_at_impact_point = (point_of_impact - self.center) / self.rad;
 
         let hit_record =
