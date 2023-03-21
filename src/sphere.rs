@@ -1,6 +1,6 @@
-use crate::hit::{Hit, HitRecord};
+use crate::hit::{Hittable, HitRecord};
 use crate::ray::Ray;
-use crate::vec3::Point3;
+use crate::vec3::{Point3, Vec3};
 
 pub struct Sphere {
     center: Point3,
@@ -41,7 +41,7 @@ impl Sphere {
     }
 }
 
-impl Hit for Sphere {
+impl Hittable for Sphere {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         // Position of the ray relative to the sphere
         let relative_position = ray.origin() - self.center;
@@ -59,28 +59,29 @@ impl Hit for Sphere {
             return None;
         }
 
-
         // Now we find the SMALLEST time of impact
         let sqrtd = discriminant.sqrt();
         let mut root = (-half_b - sqrtd) / a;
 
-        if root < t_min || t_max > root {
+        if root < t_min || root > t_max {
             root = (-half_b + sqrtd) / a;
-            if root < t_min || t_max > root {
+            if root < t_min || root > t_max {
                 // The time of interception was too small or large (behind camera or behind another object)
                 return None;
             }
         }
 
         let point_of_impact = ray.at(root);
+
+        let mut hit_record =
+            HitRecord::new(point_of_impact, Vec3::new(0.0, 0.0, 0.0), root);
+
         /*
             This is always going to have a magnitude of rad, since the vector is from the center of
             the sphere to a point in it's surface
          */
         let normal_at_impact_point = (point_of_impact - self.center) / self.rad;
-
-        let hit_record =
-            HitRecord::new(point_of_impact, normal_at_impact_point, root);
+        hit_record.set_face_normal(ray, normal_at_impact_point);
 
         Some(hit_record)
     }
