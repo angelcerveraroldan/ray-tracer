@@ -1,20 +1,62 @@
 mod coord;
 mod vector;
 
-macro_rules! multiplication {
-    ( $lhs:ty ) => {
-        impl $lhs {
+// This will implement the following:
+//
+// Equality (via apporximation)
+// Scalar multiplication (right hand side)
+// Negation and creation
+#[macro_export]
+macro_rules! pointCommons {
+    ( $typename:ty ) => {
+        impl $typename {
             pub fn negate(self) -> Self {
-                <$lhs>::new(-self.x, -self.y, -self.z)
+                <$typename>::new(-self.x, -self.y, -self.z)
             }
 
             pub fn new(x: f64, y: f64, z: f64) -> Self {
                 Self { x, y, z }
             }
         }
+
+        impl Mul<f64> for $typename {
+            type Output = $typename;
+            fn mul(self, rhs: f64) -> Self::Output {
+                Self {
+                    x: self.x * rhs,
+                    y: self.y * rhs,
+                    z: self.z * rhs,
+                }
+            }
+        }
+
+        impl Div<f64> for $typename {
+            type Output = $typename;
+            fn div(self, rhs: f64) -> Self::Output {
+                Self {
+                    x: self.x / rhs,
+                    y: self.y / rhs,
+                    z: self.z / rhs,
+                }
+            }
+        }
+
+        impl PartialEq for $typename {
+            fn eq(&self, other: &Self) -> bool {
+                approx(self.x, other.x) && approx(self.y, other.y) && approx(self.z, other.z)
+            }
+        }
+
+        // Create type from 3 numbers
+        impl<A: Into<f64>> From<(A, A, A)> for $typename {
+            fn from(value: (A, A, A)) -> Self {
+                Self::new(value.0.into(), value.1.into(), value.2.into())
+            }
+        }
     };
 }
 
+// TODO: These tests are horribly and unecessarily long
 #[cfg(test)]
 mod coords_testing {
     use crate::points::coord::*;

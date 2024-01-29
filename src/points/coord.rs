@@ -1,17 +1,13 @@
+use std::ops::{Div, Mul};
+
 use crate::approx::approx;
 use crate::points::vector::Vector;
-
 #[derive(Debug)]
+
 pub struct Coord {
     pub(crate) x: f64,
     pub(crate) y: f64,
     pub(crate) z: f64,
-}
-
-impl PartialEq for Coord {
-    fn eq(&self, other: &Self) -> bool {
-        approx(self.x, other.x) && approx(self.y, other.y) && approx(self.z, other.z)
-    }
 }
 
 impl Coord {
@@ -27,12 +23,27 @@ impl Coord {
     pub fn subtract_vector(self, vec: &Vector) -> Coord {
         Coord::new(self.x - vec.x, self.y - vec.y, self.z - vec.z)
     }
+}
 
-    pub fn negate(self) -> Self {
-        Self::new(-self.x, -self.y, -self.z)
+crate::pointCommons!(Coord);
+
+#[cfg(test)]
+mod coord_test {
+    use super::Coord;
+
+    #[test]
+    fn scalar_mult() {
+        assert_eq!(
+            Coord::new(1.3, -143.789, 1234.2) * 2.4,
+            Coord::new(1.3 * 2.4, -143.789 * 2.4, 1234.2 * 2.4),
+        )
     }
 
-    pub fn new(x: f64, y: f64, z: f64) -> Self {
-        Self { x, y, z }
+    #[test]
+    fn scalar_div() {
+        assert_eq!(
+            Coord::new(1.3, -143.789, 1234.2) / 2.4,
+            Coord::new(1.3 / 2.4, -143.789 / 2.4, 1234.2 / 2.4),
+        )
     }
 }
