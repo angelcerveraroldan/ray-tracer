@@ -19,6 +19,14 @@ impl Color {
         let b = scale(self.blue_percent)?;
         Some((r, g, b))
     }
+
+    pub fn new(red_percent: f64, green_percent: f64, blue_percent: f64) -> Self {
+        Self {
+            red_percent,
+            green_percent,
+            blue_percent,
+        }
+    }
 }
 
 fn scale(f: f64) -> Option<u8> {
