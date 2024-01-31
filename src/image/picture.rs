@@ -72,6 +72,8 @@ impl Picture {
 
 #[cfg(test)]
 mod test_pic {
+    use indoc::indoc;
+
     use super::*;
 
     #[test]
@@ -100,43 +102,46 @@ mod test_pic {
     fn larger_ppm() {
         /// Check a simple, and empty picture
         let p = Picture::new(3, 5);
-        let expected = r#"P3
-5 3
-255
-0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-"#;
+        let expected = indoc! {"
+            P3
+            5 3
+            255
+            0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+            0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+            0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+        "};
         assert_eq!(expected, p.to_ppm());
 
-        let mut p = Picture::new(2, 10);
-        for i in (0..p.height) {
-            for j in (0..p.width) {
+        let mut p = Picture::new(2, 11);
+        for i in 0..p.height {
+            for j in 0..p.width {
                 p.mutate_pixel(i, j, Color::new(1.0, 0.8, 0.6)).unwrap();
             }
         }
 
-        println!("{}", p.to_ppm());
-
-        let expected = r#"P3
-10 2
-255
-255 205 154 255 205 154 255 205 154 255 205 154 255 205 154
-255 205 154 255 205 154 255 205 154 255 205 154 255 205 154
-255 205 154 255 205 154 255 205 154 255 205 154 255 205 154
-255 205 154 255 205 154 255 205 154 255 205 154 255 205 154
-"#;
+        let expected = indoc! {"
+            P3
+            11 2
+            255
+            255 205 154 255 205 154 255 205 154 255 205 154 255 205 154
+            255 205 154 255 205 154 255 205 154 255 205 154 255 205 154
+            255 205 154
+            255 205 154 255 205 154 255 205 154 255 205 154 255 205 154
+            255 205 154 255 205 154 255 205 154 255 205 154 255 205 154
+            255 205 154
+        "};
         assert_eq!(expected, p.to_ppm());
     }
 
     #[test]
     fn save_ppm() {
         let mut p = Picture::new(1080, 1920);
-        for col in (0..p.width) {
-            for row in (0..p.height) {
+        for col in 0..p.width {
+            for row in 0..p.height {
                 let red = (row as f64) / p.height as f64;
                 let blue = (col as f64) / p.width as f64;
-                p.mutate_pixel(row, col, Color::new(red, (red + blue) / 2.0, blue));
+                p.mutate_pixel(row, col, Color::new(red, (red + blue) / 2.0, blue))
+                    .unwrap();
             }
         }
         p.save_as_ppm("./src/test/xxx.ppm".to_string());
