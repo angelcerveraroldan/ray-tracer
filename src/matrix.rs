@@ -1,3 +1,4 @@
+#[derive(Debug, PartialEq)]
 pub struct Matrix {
     height: usize,
     width: usize,
@@ -14,10 +15,16 @@ impl Matrix {
         }
     }
 
+    /// # Panics
+    ///
+    /// Will panic if i is not in range
     pub fn get_row(&self, i: usize) -> Vec<f64> {
         self.rows[i].clone()
     }
 
+    /// # Panics
+    ///
+    /// Will panic if i is not in range
     pub fn get_col(&self, i: usize) -> Vec<f64> {
         self.rows.iter().map(|row| row[i]).collect::<Vec<f64>>()
     }
@@ -31,10 +38,10 @@ impl Matrix {
         }
 
         let rows = (0..self.height).map(|row_index| {
+            let row = self.get_row(row_index);
             (0..self.width)
                 .map(|col_index| {
-                    self.get_row(row_index)
-                        .iter()
+                    row.iter()
                         .zip(rhs.get_col(col_index))
                         .map(|(a, b)| a * b)
                         .sum()
@@ -49,8 +56,72 @@ impl Matrix {
 #[cfg(test)]
 mod matrix_test {
     use super::*;
+
+    // TODO: Make a macro to make matrix easier...
     #[test]
-    fn multiply() {
-        // let m1 = Matrix::new(4, vec![])
+    fn matrix_multiply() {
+        let m1 = Matrix::new(
+            4,
+            vec![
+                vec![1.0, 2.0, 3.0, 4.0],
+                vec![1.0, 2.0, 3.0, 4.0],
+                vec![1.0, 2.0, 3.0, 4.0],
+                vec![1.0, 2.0, 3.0, 4.0],
+            ],
+        );
+
+        let m2 = Matrix::new(
+            4,
+            vec![
+                vec![1.0, 2.0, 3.0, 4.0],
+                vec![1.0, 2.0, 3.0, 4.0],
+                vec![1.0, 2.0, 3.0, 4.0],
+                vec![1.0, 2.0, 3.0, 4.0],
+            ],
+        );
+
+        let m3 = Matrix::new(
+            4,
+            vec![
+                vec![10.0, 20.0, 30.0, 40.0],
+                vec![10.0, 20.0, 30.0, 40.0],
+                vec![10.0, 20.0, 30.0, 40.0],
+                vec![10.0, 20.0, 30.0, 40.0],
+            ],
+        );
+
+        assert_eq!(m1.times(m2).unwrap(), m3);
+
+        let m1 = Matrix::new(
+            4,
+            vec![
+                vec![1.0, 2.0, 3.0, 4.0],
+                vec![5.0, 6.0, 7.0, 8.0],
+                vec![9.0, 8.0, 7.0, 6.0],
+                vec![5.0, 4.0, 3.0, 2.0],
+            ],
+        );
+
+        let m2 = Matrix::new(
+            4,
+            vec![
+                vec![-2.0, 1.0, 2.0, 3.0],
+                vec![3.0, 2.0, 1.0, -1.0],
+                vec![4.0, 3.0, 6.0, 5.0],
+                vec![1.0, 2.0, 7.0, 8.0],
+            ],
+        );
+
+        let m3 = Matrix::new(
+            4,
+            vec![
+                vec![20.0, 22.0, 50.0, 48.0],
+                vec![44.0, 54.0, 114.0, 108.0],
+                vec![40.0, 58.0, 110.0, 102.0],
+                vec![16.0, 26.0, 46.0, 42.0],
+            ],
+        );
+
+        assert_eq!(m1.times(m2).unwrap(), m3);
     }
 }
