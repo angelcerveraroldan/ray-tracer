@@ -4,10 +4,25 @@ pub struct Matrix {
     width: usize,
     rows: Vec<Vec<f64>>,
 }
-
+// TODO
+//  Multiply by tupl
+//  Multiply matrices of different size
 impl Matrix {
     /// Make a new square matrix
     pub fn new(size: usize, rows: Vec<Vec<f64>>) -> Self {
+        Self {
+            height: size,
+            width: size,
+            rows,
+        }
+    }
+
+    pub fn identity(size: usize) -> Self {
+        let mut rows = vec![vec![0.0; size]; size];
+        for i in 0..size {
+            rows[i][i] = 1.0;
+        }
+
         Self {
             height: size,
             width: size,
@@ -123,5 +138,23 @@ mod matrix_test {
         );
 
         assert_eq!(m1.times(m2).unwrap(), m3);
+    }
+
+    #[test]
+    fn identity() {
+        let id2 = Matrix::identity(2);
+        let m2x2 = Matrix::new(2, vec![vec![1.0, 0.0], vec![0.0, 1.0]]);
+        assert_eq!(id2, m2x2);
+
+        let id3 = Matrix::identity(3);
+        let m3x3 = Matrix::new(
+            3,
+            vec![
+                vec![1.0, 0.0, 0.0],
+                vec![0.0, 1.0, 0.0],
+                vec![0.0, 0.0, 1.0],
+            ],
+        );
+        assert_eq!(id3, m3x3);
     }
 }
