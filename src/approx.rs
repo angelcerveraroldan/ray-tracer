@@ -5,7 +5,23 @@ const EPSILON: f64 = 0.0001;
 /// We say two real numbers are equal if the difference between them is
 /// smaller than some epsilon constant epsilon
 pub fn approx(x: f64, y: f64) -> bool {
-    (x - y).abs() < EPSILON
+    match (x - y).abs() < EPSILON {
+        true => true,
+        false => {
+            {
+                #[cfg(test)]
+                println!(
+                    "\t\tFLOAT APPROX ERROR: |{} - {}| = {} ≮ {}",
+                    x,
+                    y,
+                    (x - y).abs(),
+                    EPSILON
+                );
+            }
+
+            false
+        }
+    }
 }
 
 #[cfg(test)]

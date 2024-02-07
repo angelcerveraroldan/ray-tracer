@@ -1,5 +1,14 @@
 use core::panic;
+use std::fmt::Debug;
 
+// FIME:
+//     matrix[
+//         1, 2;
+//         3, 4;
+//     ];
+//
+//     will give an error (not sqaure matrix)
+//
 macro_rules! matrix {
     ($($($element:expr),*);*) => {
         SquareMatrix::from(vec![$( vec![ $($element),* ] ), *])
@@ -13,7 +22,8 @@ struct SquareMatrix {
     pub data: Vec<Vec<f64>>,
 }
 
-impl<A: Into<f64> + Copy> From<Vec<Vec<A>>> for SquareMatrix {
+// TODO: This may be better as TryInto
+impl<A: Into<f64> + Copy + Debug> From<Vec<Vec<A>>> for SquareMatrix {
     fn from(data: Vec<Vec<A>>) -> Self {
         let height = data.len();
         let width = data[0].len();
@@ -124,10 +134,29 @@ impl SquareMatrix {
         let new = self.times_tuple(vec![coord.x, coord.y, coord.z])?;
         Some(crate::points::coord::Coord::new(new[0], new[1], new[2]))
     }
+
+    pub fn det(&self) -> f64 {
+        match self.size {
+            2 => self.data[0][0] * self.data[1][1] - self.data[0][1] * self.data[1][0],
+            _ => panic!("Noooo"),
+        }
+    }
+
+    pub fn remove_indexes(&self, row: usize, col: usize) -> SquareMatrix {
+        let mut data = self.data.clone();
+        data.remove(row);
+        data.iter_mut().for_each(|row| {
+            row.remove(col);
+        });
+
+        SquareMatrix::new(self.size - 1, data)
+    }
 }
 
 #[cfg(test)]
 mod matrix_test {
+    use crate::approx::approx;
+
     use super::*;
     #[test]
     fn macro_test() {
@@ -234,5 +263,58 @@ mod matrix_test {
             0, 8, 3, 8];
 
         assert_eq!(m.transpose(), t);
+    }
+
+    #[test]
+    fn submatrix() {
+        let m = matrix![
+             1, 5,  0;
+            -3, 2,  7;
+             0,  6, -3];
+
+        assert_eq!(
+            m.remove_indexes(0, 0),
+            matrix![
+                2,  7; 
+                6, -3],
+        );
+
+        assert_eq!(
+            m.remove_indexes(0, 1),
+            matrix![
+                -3,  7; 
+                 0, -3],
+        );
+
+        assert_eq!(
+            m.remove_indexes(2, 1),
+            matrix![
+                 1,  0; 
+                -3,  7],
+        );
+
+        assert_eq!(
+            matrix![
+                -6, 1,  1, 6;
+                -8, 5,  8, 6;
+                -1, 0,  8, 6;
+                -7, 1, -1, 1]
+            .remove_indexes(2, 1),
+            matrix![
+                -6,  1, 6;
+                -8,  8, 6;
+                -7, -1, 1]
+        )
+    }
+
+    #[test]
+    fn determinant() {
+        assert!(approx(
+            matrix![
+                 1, 5;
+                -3, 2]
+            .det(),
+            17.0
+        ));
     }
 }
