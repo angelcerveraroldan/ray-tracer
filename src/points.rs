@@ -1,5 +1,5 @@
-mod coord;
-mod vector;
+pub mod coord;
+pub mod vector;
 
 // This will implement the following:
 //
