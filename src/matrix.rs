@@ -62,6 +62,19 @@ impl SquareMatrix {
         Self { size, data }
     }
 
+    pub fn map_elements<Func>(&self, f: Func) -> SquareMatrix
+    where
+        Func: Fn(&f64) -> f64,
+    {
+        SquareMatrix::new(
+            self.size,
+            self.data
+                .iter()
+                .map(|row| row.iter().map(|element| f(element)).collect())
+                .collect(),
+        )
+    }
+
     /// # Panics
     ///
     /// Will panic if i is not in range
@@ -135,13 +148,6 @@ impl SquareMatrix {
         Some(crate::points::coord::Coord::new(new[0], new[1], new[2]))
     }
 
-    pub fn det(&self) -> f64 {
-        match self.size {
-            2 => self.data[0][0] * self.data[1][1] - self.data[0][1] * self.data[1][0],
-            _ => panic!("Noooo"),
-        }
-    }
-
     pub fn remove_indexes(&self, row: usize, col: usize) -> SquareMatrix {
         let mut data = self.data.clone();
         data.remove(row);
@@ -151,11 +157,49 @@ impl SquareMatrix {
 
         SquareMatrix::new(self.size - 1, data)
     }
+
+    pub fn det(&self) -> f64 {
+        match self.size {
+            2 => self.data[0][0] * self.data[1][1] - self.data[0][1] * self.data[1][0],
+            _ => (0..self.size)
+                .map(|index| self.data[0][index] * self.cofactor(0, index))
+                .sum(),
+        }
+    }
+
+    pub fn minor(&self, row: usize, col: usize) -> f64 {
+        self.remove_indexes(row, col).det()
+    }
+
+    pub fn cofactor(&self, row: usize, col: usize) -> f64 {
+        (if row + col % 2 == 1 { -1.0 } else { 1.0 }) * self.minor(row, col)
+    }
+
+    pub fn invert(&self) -> Option<SquareMatrix> {
+        let det = self.det();
+
+        if det == 0.0 {
+            return None;
+        }
+
+        let data = (0..self.size)
+            .map(|row_index| {
+                (0..self.size)
+                    .map(|col_index| self.cofactor(row_index, col_index))
+                    .collect()
+            })
+            .collect::<Vec<Vec<f64>>>();
+
+        SquareMatrix::from(data)
+            .transpose()
+            .map_elements(|x| x / det)
+            .into()
+    }
 }
 
 #[cfg(test)]
 mod matrix_test {
-    use crate::approx::approx;
+    use crate::{approx::approx, matrix};
 
     use super::*;
     #[test]
@@ -177,6 +221,13 @@ mod matrix_test {
         );
 
         assert_eq!(m1, m2);
+    }
+    #[test]
+    fn map_matrix() {
+        assert_eq!(
+            matrix![1, 2; 3, 4].map_elements(|&n| n + 1.0),
+            matrix![2, 3; 4, 5]
+        )
     }
 
     #[test]
@@ -316,5 +367,52 @@ mod matrix_test {
             .det(),
             17.0
         ));
+
+        assert!(approx(
+            matrix![
+                  1, 2,  6;
+                 -5, 8, -4;
+                  2, 6,  4]
+            .det(),
+            -196.0
+        ));
+
+        assert!(approx(
+            matrix![
+                -2, -8,  3,  5;
+                -3,  1,  7,  3;
+                 1,  2, -9,  6;
+                -6,  7,  7, -9]
+            .det(),
+            -4071.0
+        ));
+
+        assert!(approx(
+            matrix![
+                6, 4, 4, 4;
+                5, 5, 7, 6;
+                4, -9, 3, -7;
+                9, 1, 7, -6]
+            .det(),
+            -2120.0
+        ));
+    }
+
+    #[test]
+    fn minor_cofactor() {
+        let m = matrix![3, 5, 0; 2, -1, -7; 6, -1, 5];
+        assert!(approx(m.minor(0, 0), -12.0));
+        assert!(approx(m.cofactor(0, 0), -12.0));
+        assert!(approx(m.minor(1, 0), 25.0));
+        assert!(approx(m.cofactor(1, 0), -25.0));
+    }
+
+    #[test]
+    fn inverse() {
+        let m = matrix![
+            8, -5, 9, 2;
+            7, 5, 6, 2, 1;
+
+        ]
     }
 }

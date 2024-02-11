@@ -11,7 +11,7 @@ pub fn approx(x: f64, y: f64) -> bool {
             {
                 #[cfg(test)]
                 println!(
-                    "\t\tFLOAT APPROX ERROR: |{} - {}| = {} ≮ {}",
+                    "==== FLOAT APPROX ERROR: |{} - {}| = {} ≮ {} ====",
                     x,
                     y,
                     (x - y).abs(),
