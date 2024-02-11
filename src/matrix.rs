@@ -1,6 +1,8 @@
 use core::panic;
 use std::fmt::Debug;
 
+use crate::approx::approx;
+
 // FIME:
 //     matrix[
 //         1, 2;
@@ -16,10 +18,32 @@ macro_rules! matrix {
 }
 
 // Can we always know the size at compile time ? If so, we can make this a bit nicer
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 struct SquareMatrix {
     pub size: usize,
     pub data: Vec<Vec<f64>>,
+}
+
+impl PartialEq for SquareMatrix {
+    fn eq(&self, other: &Self) -> bool {
+        if self.size != other.size {
+            return false;
+        }
+
+        for row_index in 0..self.size {
+            let row_self = &self.data[row_index];
+            let row_other = &other.data[row_index];
+            for col_index in 0..self.size {
+                let a = row_self[col_index];
+                let b = row_other[col_index];
+                if !approx(a, b) {
+                    return false;
+                }
+            }
+        }
+
+        true
+    }
 }
 
 // TODO: This may be better as TryInto
@@ -172,14 +196,23 @@ impl SquareMatrix {
     }
 
     pub fn cofactor(&self, row: usize, col: usize) -> f64 {
-        (if row + col % 2 == 1 { -1.0 } else { 1.0 }) * self.minor(row, col)
+        (if (row + col) % 2 == 1 { -1.0 } else { 1.0 }) * self.minor(row, col)
+    }
+
+    fn inverse2x2(&self, det: f64) -> SquareMatrix {
+        let l = 1.0 / det;
+        matrix![self.data[1][1], -self.data[0][1]; -self.data[1][0], self.data[0][0]]
+            .map_elements(|x| x * l)
     }
 
     pub fn invert(&self) -> Option<SquareMatrix> {
         let det = self.det();
-
         if det == 0.0 {
             return None;
+        }
+
+        if self.size == 2 {
+            return self.inverse2x2(det).into();
         }
 
         let data = (0..self.size)
@@ -199,7 +232,7 @@ impl SquareMatrix {
 
 #[cfg(test)]
 mod matrix_test {
-    use crate::{approx::approx, matrix};
+    use crate::approx::approx;
 
     use super::*;
     #[test]
@@ -275,20 +308,11 @@ mod matrix_test {
 
     #[test]
     fn identity() {
-        let id2 = SquareMatrix::identity(2);
-        let m2x2 = matrix![
-            1, 0;
-            0, 1];
-
-        assert_eq!(id2, m2x2);
-
-        let id3 = SquareMatrix::identity(3);
-        let m3x3 = matrix![
-            1, 0, 0;
-            0, 1, 0;
-            0, 0, 1];
-
-        assert_eq!(id3, m3x3);
+        assert_eq!(SquareMatrix::identity(2), matrix![1, 0; 0, 1]);
+        assert_eq!(
+            SquareMatrix::identity(3),
+            matrix![1, 0, 0; 0, 1, 0; 0, 0, 1]
+        );
 
         let m4 = matrix![
             20, 22, 50, 48;
@@ -318,31 +342,11 @@ mod matrix_test {
 
     #[test]
     fn submatrix() {
-        let m = matrix![
-             1, 5,  0;
-            -3, 2,  7;
-             0,  6, -3];
+        let m = matrix![1, 5, 0; -3, 2, 7; 0, 6, -3];
 
-        assert_eq!(
-            m.remove_indexes(0, 0),
-            matrix![
-                2,  7; 
-                6, -3],
-        );
-
-        assert_eq!(
-            m.remove_indexes(0, 1),
-            matrix![
-                -3,  7; 
-                 0, -3],
-        );
-
-        assert_eq!(
-            m.remove_indexes(2, 1),
-            matrix![
-                 1,  0; 
-                -3,  7],
-        );
+        assert_eq!(m.remove_indexes(0, 0), matrix![2, 7; 6, -3]);
+        assert_eq!(m.remove_indexes(0, 1), matrix![-3, 7; 0, -3]);
+        assert_eq!(m.remove_indexes(2, 1), matrix![1, 0; -3, 7]);
 
         assert_eq!(
             matrix![
@@ -360,23 +364,8 @@ mod matrix_test {
 
     #[test]
     fn determinant() {
-        assert!(approx(
-            matrix![
-                 1, 5;
-                -3, 2]
-            .det(),
-            17.0
-        ));
-
-        assert!(approx(
-            matrix![
-                  1, 2,  6;
-                 -5, 8, -4;
-                  2, 6,  4]
-            .det(),
-            -196.0
-        ));
-
+        assert!(approx(matrix![1, 5; -3, 2].det(), 17.0));
+        assert!(approx(matrix![1, 2, 6; -5, 8, -4; 2, 6, 4].det(), -196.0));
         assert!(approx(
             matrix![
                 -2, -8,  3,  5;
@@ -397,7 +386,6 @@ mod matrix_test {
             -2120.0
         ));
     }
-
     #[test]
     fn minor_cofactor() {
         let m = matrix![3, 5, 0; 2, -1, -7; 6, -1, 5];
@@ -405,14 +393,65 @@ mod matrix_test {
         assert!(approx(m.cofactor(0, 0), -12.0));
         assert!(approx(m.minor(1, 0), 25.0));
         assert!(approx(m.cofactor(1, 0), -25.0));
+
+        let m = matrix![
+                -2, -8,  3,  5;
+                -3,  1,  7,  3;
+                 1,  2, -9,  6;
+                -6,  7,  7, -9];
+
+        assert!(approx(m.cofactor(0, 0), 690.0));
+        assert!(approx(m.cofactor(0, 1), 447.0));
+        assert!(approx(m.cofactor(0, 2), 210.0));
+        assert!(approx(m.cofactor(0, 3), 51.0));
+        assert!(approx(m.cofactor(1, 0), -253.0));
+        assert!(approx(m.cofactor(1, 1), -394.0));
+
+        let m = matrix![
+                -5, 2, 6, -8;
+                1, -5, 1, 8;
+                7, 7, -6, -7;
+                1, -3, 7, 4
+        ];
+
+        assert!(approx(m.cofactor(0, 0), 116.0));
+        assert!(approx(m.cofactor(0, 1), -430.0));
+        assert!(approx(m.cofactor(0, 2), -42.0));
+        assert!(approx(m.cofactor(0, 3), -278.0));
+
+        assert!(approx(m.cofactor(1, 0), 240.0));
+        assert!(approx(m.cofactor(1, 1), -775.0));
+        assert!(approx(m.cofactor(1, 2), -119.0));
+        assert!(approx(m.cofactor(1, 3), -433.0));
+
+        assert!(approx(m.cofactor(2, 0), 128.0));
+        assert!(approx(m.cofactor(2, 1), -236.0));
+        assert!(approx(m.cofactor(2, 2), -28.0));
+        assert!(approx(m.cofactor(2, 3), -160.0));
     }
 
     #[test]
     fn inverse() {
+        let m = matrix![1, 3; -3, 12];
+        assert_eq!(
+            m.invert().unwrap(),
+            matrix![4.0/7.0, -1.0/7.0; 1.0/7.0, 1.0/21.0]
+        );
+
         let m = matrix![
             8, -5, 9, 2;
-            7, 5, 6, 2, 1;
+            7, 5, 6, 1;
+            -6, 0, 9, 6;
+            -3, 0, -9, -4
+        ];
 
-        ]
+        let acc = matrix![
+            -0.15385, -0.15385, -0.28205, -0.53846;
+            -0.07692, 0.12308, 0.02564, 0.03077;
+            0.35897, 0.35897, 0.43590, 0.92308;
+            -0.69231, -0.69231, -0.76923, -1.92308
+        ];
+
+        assert_eq!(acc, m.invert().unwrap());
     }
 }
