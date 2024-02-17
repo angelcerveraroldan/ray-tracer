@@ -12,8 +12,11 @@ use crate::approx::approx;
 //     will give an error (not sqaure matrix)
 //
 macro_rules! matrix {
+    ($($($element:expr),*;)*) => {
+        crate::matrix::SquareMatrix::from(vec![$( vec![ $($element),* ] ), *])
+    };
     ($($($element:expr),*);*) => {
-        SquareMatrix::from(vec![$( vec![ $($element),* ] ), *])
+        crate::matrix::SquareMatrix::from(vec![$( vec![ $($element),* ] ), *])
     };
 }
 
@@ -254,7 +257,17 @@ mod matrix_test {
         );
 
         assert_eq!(m1, m2);
+
+        let m1 = matrix![
+            1, 2, 3, 4;
+            1, 2, 3, 4;
+            1, 2, 3, 4;
+            1, 2, 3, 4;
+        ];
+
+        assert_eq!(m1, m2);
     }
+
     #[test]
     fn map_matrix() {
         assert_eq!(
