@@ -11,6 +11,13 @@ use std::{
 use square2::Matrix2x2;
 
 #[derive(Debug, Clone)]
+/// More generic struct for a square matrix
+///
+/// For this use case, we will assume that S = 2, 3, or 4
+/// as larger matrices will not be used in the ray tracer.
+/// This is *purposely* not a square matrix of any size, as
+/// a lot of the methods implemented would need a lot of
+/// optimizing for a larger matrix
 pub struct SquareMatrix<const S: usize> {
     pub data: Vec<Vec<f64>>,
 }
