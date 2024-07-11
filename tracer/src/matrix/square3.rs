@@ -85,4 +85,13 @@ mod matrix_3x3_test {
             -196.0
         ));
     }
+
+    #[test]
+    fn minor_cofactor() {
+        let m = matrix_3x3![3, 5, 0; 2, -1, -7; 6, -1, 5];
+        assert!(approx(m.minor(0, 0), -12.0));
+        assert!(approx(m.cofactor(0, 0), -12.0));
+        assert!(approx(m.minor(1, 0), 25.0));
+        assert!(approx(m.cofactor(1, 0), -25.0));
+    }
 }

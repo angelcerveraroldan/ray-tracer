@@ -54,7 +54,7 @@ impl Matrix4x4 {
 
 #[cfg(test)]
 mod matrix_4x4_test {
-    use crate::{approx::approx, matrix_3x3};
+    use crate::{approx::approx, matrix, matrix_2x2, matrix_3x3};
 
     use super::*;
     use crate::matrix::square3::*;
@@ -212,72 +212,60 @@ mod matrix_4x4_test {
         ));
     }
 
-    // #[test]
-    // fn minor_cofactor() {
-    //     let m = matrix![3, 5, 0; 2, -1, -7; 6, -1, 5];
-    //     assert!(approx(m.minor(0, 0), -12.0));
-    //     assert!(approx(m.cofactor(0, 0), -12.0));
-    //     assert!(approx(m.minor(1, 0), 25.0));
-    //     assert!(approx(m.cofactor(1, 0), -25.0));
-    //
-    //     let m = matrix![
-    //             -2, -8,  3,  5;
-    //             -3,  1,  7,  3;
-    //              1,  2, -9,  6;
-    //             -6,  7,  7, -9];
-    //
-    //     assert!(approx(m.cofactor(0, 0), 690.0));
-    //     assert!(approx(m.cofactor(0, 1), 447.0));
-    //     assert!(approx(m.cofactor(0, 2), 210.0));
-    //     assert!(approx(m.cofactor(0, 3), 51.0));
-    //     assert!(approx(m.cofactor(1, 0), -253.0));
-    //     assert!(approx(m.cofactor(1, 1), -394.0));
-    //
-    //     let m = matrix![
-    //             -5, 2, 6, -8;
-    //             1, -5, 1, 8;
-    //             7, 7, -6, -7;
-    //             1, -3, 7, 4
-    //     ];
-    //
-    //     assert!(approx(m.cofactor(0, 0), 116.0));
-    //     assert!(approx(m.cofactor(0, 1), -430.0));
-    //     assert!(approx(m.cofactor(0, 2), -42.0));
-    //     assert!(approx(m.cofactor(0, 3), -278.0));
-    //
-    //     assert!(approx(m.cofactor(1, 0), 240.0));
-    //     assert!(approx(m.cofactor(1, 1), -775.0));
-    //     assert!(approx(m.cofactor(1, 2), -119.0));
-    //     assert!(approx(m.cofactor(1, 3), -433.0));
-    //
-    //     assert!(approx(m.cofactor(2, 0), 128.0));
-    //     assert!(approx(m.cofactor(2, 1), -236.0));
-    //     assert!(approx(m.cofactor(2, 2), -28.0));
-    //     assert!(approx(m.cofactor(2, 3), -160.0));
-    // }
-    //
-    // #[test]
-    // fn inverse() {
-    //     let m = matrix![1, 3; -3, 12];
-    //     assert_eq!(
-    //         m.invert().unwrap(),
-    //         matrix![4.0/7.0, -1.0/7.0; 1.0/7.0, 1.0/21.0]
-    //     );
-    //
-    //     let m = matrix![
-    //         8, -5, 9, 2;
-    //         7, 5, 6, 1;
-    //         -6, 0, 9, 6;
-    //         -3, 0, -9, -4
-    //     ];
-    //
-    //     let acc = matrix![
-    //         -0.15385, -0.15385, -0.28205, -0.53846;
-    //         -0.07692, 0.12308, 0.02564, 0.03077;
-    //         0.35897, 0.35897, 0.43590, 0.92308;
-    //         -0.69231, -0.69231, -0.76923, -1.92308
-    //     ];
-    //
-    //     assert_eq!(acc, m.invert().unwrap());
-    // }
+    #[test]
+    fn minor_cofactor() {
+        let m = matrix_4x4![
+                -2, -8,  3,  5;
+                -3,  1,  7,  3;
+                 1,  2, -9,  6;
+                -6,  7,  7, -9];
+
+        assert!(approx(m.cofactor(0, 0), 690.0));
+        assert!(approx(m.cofactor(0, 1), 447.0));
+        assert!(approx(m.cofactor(0, 2), 210.0));
+        assert!(approx(m.cofactor(0, 3), 51.0));
+        assert!(approx(m.cofactor(1, 0), -253.0));
+        assert!(approx(m.cofactor(1, 1), -394.0));
+
+        let m = matrix_4x4![
+                -5, 2, 6, -8;
+                1, -5, 1, 8;
+                7, 7, -6, -7;
+                1, -3, 7, 4
+        ];
+
+        assert!(approx(m.cofactor(0, 0), 116.0));
+        assert!(approx(m.cofactor(0, 1), -430.0));
+        assert!(approx(m.cofactor(0, 2), -42.0));
+        assert!(approx(m.cofactor(0, 3), -278.0));
+
+        assert!(approx(m.cofactor(1, 0), 240.0));
+        assert!(approx(m.cofactor(1, 1), -775.0));
+        assert!(approx(m.cofactor(1, 2), -119.0));
+        assert!(approx(m.cofactor(1, 3), -433.0));
+
+        assert!(approx(m.cofactor(2, 0), 128.0));
+        assert!(approx(m.cofactor(2, 1), -236.0));
+        assert!(approx(m.cofactor(2, 2), -28.0));
+        assert!(approx(m.cofactor(2, 3), -160.0));
+    }
+
+    #[test]
+    fn inverse() {
+        let m = matrix_4x4![
+            8, -5, 9, 2;
+            7, 5, 6, 1;
+            -6, 0, 9, 6;
+            -3, 0, -9, -4
+        ];
+
+        let acc = matrix_4x4![
+            -0.15385, -0.15385, -0.28205, -0.53846;
+            -0.07692, 0.12308, 0.02564, 0.03077;
+            0.35897, 0.35897, 0.43590, 0.92308;
+            -0.69231, -0.69231, -0.76923, -1.92308
+        ];
+
+        assert_eq!(Some(acc), m.inverse());
+    }
 }

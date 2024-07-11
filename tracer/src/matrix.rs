@@ -1,3 +1,4 @@
+pub mod commons;
 pub mod square2;
 pub mod square3;
 pub mod square4;
@@ -7,9 +8,28 @@ use std::{
     usize,
 };
 
-#[derive(Debug, PartialEq, Clone)]
+use square2::Matrix2x2;
+
+#[derive(Debug, Clone)]
 pub struct SquareMatrix<const S: usize> {
     pub data: Vec<Vec<f64>>,
+}
+
+impl<const S: usize> PartialEq for SquareMatrix<S> {
+    fn eq(&self, other: &Self) -> bool {
+        for row_index in 0..S {
+            for col_index in 0..S {
+                let a = self[(row_index, col_index)];
+                let b = other[(row_index, col_index)];
+
+                if !crate::approx::approx(a, b) {
+                    return false;
+                }
+            }
+        }
+
+        true
+    }
 }
 
 impl<const S: usize> Default for SquareMatrix<S> {
