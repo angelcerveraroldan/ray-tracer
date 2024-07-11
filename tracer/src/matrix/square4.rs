@@ -35,13 +35,20 @@ impl Mul for Matrix4x4 {
 }
 
 impl Matrix4x4 {
-    fn remove_indexes(&self, row: usize, col: usize) -> crate::matrix::square3::Matrix3x3 {
+    pub fn remove_indexes(&self, row: usize, col: usize) -> crate::matrix::square3::Matrix3x3 {
         let mut data = self.data.clone();
         data.remove(row);
         for r in data.iter_mut() {
             r.remove(col);
         }
         Matrix3x3::from(data)
+    }
+
+    pub fn det(&self) -> f64 {
+        self[(0, 0)] * self.remove_indexes(0, 0).det()
+            - self[(0, 1)] * self.remove_indexes(0, 1).det()
+            + self[(0, 2)] * self.remove_indexes(0, 2).det()
+            - self[(0, 3)] * self.remove_indexes(0, 3).det()
     }
 }
 
@@ -182,30 +189,29 @@ mod matrix_4x4_test {
         )
     }
 
-    // #[test]
-    // fn determinant() {
-    //     assert!(approx(matrix![1, 5; -3, 2].det(), 17.0));
-    //     assert!(approx(matrix![1, 2, 6; -5, 8, -4; 2, 6, 4].det(), -196.0));
-    //     assert!(approx(
-    //         matrix![
-    //             -2, -8,  3,  5;
-    //             -3,  1,  7,  3;
-    //              1,  2, -9,  6;
-    //             -6,  7,  7, -9]
-    //         .det(),
-    //         -4071.0
-    //     ));
-    //
-    //     assert!(approx(
-    //         matrix![
-    //             6, 4, 4, 4;
-    //             5, 5, 7, 6;
-    //             4, -9, 3, -7;
-    //             9, 1, 7, -6]
-    //         .det(),
-    //         -2120.0
-    //     ));
-    // }
+    #[test]
+    fn determinant() {
+        assert!(approx(
+            matrix_4x4![
+                -2, -8,  3,  5;
+                -3,  1,  7,  3;
+                 1,  2, -9,  6;
+                -6,  7,  7, -9]
+            .det(),
+            -4071.0
+        ));
+
+        assert!(approx(
+            matrix_4x4![
+                6, 4, 4, 4;
+                5, 5, 7, 6;
+                4, -9, 3, -7;
+                9, 1, 7, -6]
+            .det(),
+            -2120.0
+        ));
+    }
+
     // #[test]
     // fn minor_cofactor() {
     //     let m = matrix![3, 5, 0; 2, -1, -7; 6, -1, 5];
