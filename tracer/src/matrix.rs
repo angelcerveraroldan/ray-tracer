@@ -144,4 +144,9 @@ impl<const S: usize> SquareMatrix<S> {
         }
         m
     }
+
+    #[inline(always)]
+    pub fn mutate_to(&mut self, pos: (usize, usize), to: f64) {
+        self[pos] = to;
+    }
 }
