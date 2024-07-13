@@ -74,12 +74,6 @@ mod coords_testing {
         z: 25.4859126077,
     };
 
-    const VEC3: Vector = Vector {
-        x: 65.3617525973,
-        y: 11.7450001457,
-        z: 19.5928891141,
-    };
-
     const COORD1: Coord = Coord {
         x: 1.0,
         y: 1.0,
