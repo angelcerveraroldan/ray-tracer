@@ -12,6 +12,7 @@ use crate::{
 *
 * */
 
+/// Helper Structure used to genrate transformation matrices
 struct TransformationMatrix;
 
 impl TransformationMatrix {
@@ -81,6 +82,7 @@ where
     Self: Sized,
     crate::matrix::square4::Matrix4x4: for<'a> Mul<&'a Self, Output = Self>,
 {
+    /// Tanslate (move) by a certain ammount. Note that vectors cannot be translated
     fn translate(&self, by: Coord) -> Self {
         TransformationMatrix::translation(by) * self
     }
