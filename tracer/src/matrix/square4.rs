@@ -80,8 +80,8 @@ impl Mul<Coord> for Matrix4x4 {
     type Output = Coord;
     fn mul(self, rhs: Coord) -> Self::Output {
         let x = self[(0, 0)] * rhs.x + self[(0, 1)] * rhs.y + self[(0, 2)] * rhs.z + self[(0, 3)];
-        let y = self[(1, 0)] * rhs.x + self[(1, 1)] * rhs.y + self[(1, 2)] * rhs.z + self[(0, 3)];
-        let z = self[(2, 0)] * rhs.x + self[(2, 1)] * rhs.y + self[(2, 2)] * rhs.z + self[(0, 3)];
+        let y = self[(1, 0)] * rhs.x + self[(1, 1)] * rhs.y + self[(1, 2)] * rhs.z + self[(1, 3)];
+        let z = self[(2, 0)] * rhs.x + self[(2, 1)] * rhs.y + self[(2, 2)] * rhs.z + self[(2, 3)];
         Coord::new(x, y, z)
     }
 }
@@ -90,8 +90,8 @@ impl Mul<&Coord> for Matrix4x4 {
     type Output = Coord;
     fn mul(self, rhs: &Coord) -> Self::Output {
         let x = self[(0, 0)] * rhs.x + self[(0, 1)] * rhs.y + self[(0, 2)] * rhs.z + self[(0, 3)];
-        let y = self[(1, 0)] * rhs.x + self[(1, 1)] * rhs.y + self[(1, 2)] * rhs.z + self[(0, 3)];
-        let z = self[(2, 0)] * rhs.x + self[(2, 1)] * rhs.y + self[(2, 2)] * rhs.z + self[(0, 3)];
+        let y = self[(1, 0)] * rhs.x + self[(1, 1)] * rhs.y + self[(1, 2)] * rhs.z + self[(1, 3)];
+        let z = self[(2, 0)] * rhs.x + self[(2, 1)] * rhs.y + self[(2, 2)] * rhs.z + self[(2, 3)];
         Coord::new(x, y, z)
     }
 }
@@ -310,5 +310,37 @@ mod matrix_4x4_test {
         ];
 
         assert_eq!(Some(acc), m.inverse());
+    }
+
+    #[test]
+    fn times_vector() {
+        let v = Vector::from((1, 2, 3));
+        let m = Matrix4x4::identity();
+
+        assert_eq!(v.clone(), (m * v.clone()));
+
+        let m = matrix_4x4!(
+            1, 2, 0, 1;
+            4, 3, 1, 0;
+            1, 2, 0, 1;
+            4, 3, 1, 0;
+        );
+
+        let expected = Vector::from((5, 13, 5));
+        assert_eq!(expected, (m * v.clone()));
+    }
+
+    #[test]
+    fn times_coord() {
+        let c = Coord::from((1, 2, 3));
+        let m = matrix_4x4!(
+            1, 2, 0, 1;
+            4, 3, 1, 0;
+            1, 2, 0, 1;
+            4, 3, 1, 0;
+        );
+
+        let expected = Coord::from((6, 13, 6));
+        assert_eq!(expected, (m * c.clone()));
     }
 }
