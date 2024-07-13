@@ -48,9 +48,29 @@ impl Mul<Vector> for Matrix3x3 {
     }
 }
 
+impl Mul<&Vector> for Matrix3x3 {
+    type Output = Vector;
+    fn mul(self, rhs: &Vector) -> Self::Output {
+        let x = self[(0, 0)] * rhs.x + self[(0, 1)] * rhs.y + self[(0, 2)] * rhs.z;
+        let y = self[(1, 0)] * rhs.x + self[(1, 1)] * rhs.y + self[(1, 2)] * rhs.z;
+        let z = self[(2, 0)] * rhs.x + self[(2, 1)] * rhs.y + self[(2, 2)] * rhs.z;
+        Vector::new(x, y, z)
+    }
+}
+
 impl Mul<Coord> for Matrix3x3 {
     type Output = Coord;
     fn mul(self, rhs: Coord) -> Self::Output {
+        let x = self[(0, 0)] * rhs.x + self[(0, 1)] * rhs.y + self[(0, 2)] * rhs.z;
+        let y = self[(1, 0)] * rhs.x + self[(1, 1)] * rhs.y + self[(1, 2)] * rhs.z;
+        let z = self[(2, 0)] * rhs.x + self[(2, 1)] * rhs.y + self[(2, 2)] * rhs.z;
+        Coord::new(x, y, z)
+    }
+}
+
+impl Mul<&Coord> for Matrix3x3 {
+    type Output = Coord;
+    fn mul(self, rhs: &Coord) -> Self::Output {
         let x = self[(0, 0)] * rhs.x + self[(0, 1)] * rhs.y + self[(0, 2)] * rhs.z;
         let y = self[(1, 0)] * rhs.x + self[(1, 1)] * rhs.y + self[(1, 2)] * rhs.z;
         let z = self[(2, 0)] * rhs.x + self[(2, 1)] * rhs.y + self[(2, 2)] * rhs.z;
