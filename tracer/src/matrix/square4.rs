@@ -1,6 +1,6 @@
 use square3::Matrix3x3;
 
-use crate::point::{self, coord::Coord};
+use crate::point::{coord::Coord, vector::Vector};
 
 use super::*;
 
@@ -52,12 +52,35 @@ impl Matrix4x4 {
     }
 }
 
+/**********************************************
+    MATRIX OPERATIONS FOR VECTORS / COORDS
+***********************************************/
+
+impl Mul<Vector> for Matrix4x4 {
+    type Output = Vector;
+    fn mul(self, rhs: Vector) -> Self::Output {
+        let x = self[(0, 0)] * rhs.x + self[(0, 1)] * rhs.y + self[(0, 2)] * rhs.z;
+        let y = self[(1, 0)] * rhs.x + self[(1, 1)] * rhs.y + self[(1, 2)] * rhs.z;
+        let z = self[(2, 0)] * rhs.x + self[(2, 1)] * rhs.y + self[(2, 2)] * rhs.z;
+        Vector::new(x, y, z)
+    }
+}
+
+impl Mul<Coord> for Matrix4x4 {
+    type Output = Coord;
+    fn mul(self, rhs: Coord) -> Self::Output {
+        let x = self[(0, 0)] * rhs.x + self[(0, 1)] * rhs.y + self[(0, 2)] * rhs.z + self[(0, 3)];
+        let y = self[(1, 0)] * rhs.x + self[(1, 1)] * rhs.y + self[(1, 2)] * rhs.z + self[(0, 3)];
+        let z = self[(2, 0)] * rhs.x + self[(2, 1)] * rhs.y + self[(2, 2)] * rhs.z + self[(0, 3)];
+        Coord::new(x, y, z)
+    }
+}
+
 #[cfg(test)]
 mod matrix_4x4_test {
-    use crate::{approx::approx, matrix, matrix_2x2, matrix_3x3};
-
     use super::*;
-    use crate::matrix::square3::*;
+    use crate::{approx::approx, matrix_3x3};
+
     #[test]
     fn macro_test() {
         let m1 = matrix_4x4![
