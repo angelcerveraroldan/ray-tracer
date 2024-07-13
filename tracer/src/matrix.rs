@@ -9,8 +9,6 @@ use std::{
     usize,
 };
 
-use square2::Matrix2x2;
-
 #[derive(Debug, Clone)]
 /// More generic struct for a square matrix
 ///
