@@ -5,7 +5,7 @@ use crate::{
     point::{coord::Coord, vector::Vector},
 };
 
-pub struct TransformationMatrix;
+struct TransformationMatrix;
 
 impl TransformationMatrix {
     fn translation(by: Coord) -> Matrix4x4 {
@@ -14,6 +14,14 @@ impl TransformationMatrix {
         m.mutate_to((1, 3), by.y);
         m.mutate_to((2, 3), by.z);
         m
+    }
+
+    fn scaling(by: Coord) -> Matrix4x4 {
+        let mut id4x4 = Matrix4x4::identity();
+        id4x4.mutate_to((0, 0), by.x);
+        id4x4.mutate_to((1, 1), by.y);
+        id4x4.mutate_to((2, 2), by.z);
+        id4x4
     }
 }
 
@@ -24,6 +32,10 @@ where
 {
     fn translate(&self, by: Coord) -> Self {
         TransformationMatrix::translation(by) * self
+    }
+
+    fn scale(&self, by: Coord) -> Self {
+        TransformationMatrix::scaling(by) * self
     }
 }
 
@@ -67,5 +79,20 @@ mod test_transformations {
         let v = Vector::from((-3, 4, 5));
         let acc = v.translate(Coord::from((5, -3, 2)));
         assert_eq!(v, acc);
+    }
+
+    #[test]
+    fn scale() {
+        let p = Coord::from((-4, 6, 8));
+        let v = Vector::from((-4, 6, 8));
+
+        let exp_p = Coord::from((-8, 18, 32));
+        let exp_v = Vector::from((-8, 18, 32));
+
+        let acc_p = p.scale(Coord::from((2, 3, 4)));
+        let acc_v = v.scale(Coord::from((2, 3, 4)));
+
+        assert_eq!(exp_v, acc_v);
+        assert_eq!(exp_p, acc_p);
     }
 }
