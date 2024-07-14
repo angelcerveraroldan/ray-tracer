@@ -83,12 +83,18 @@ where
     crate::matrix::square4::Matrix4x4: for<'a> Mul<&'a Self, Output = Self>,
 {
     /// Tanslate (move) by a certain ammount. Note that vectors cannot be translated
-    fn translate(&self, by: Coord) -> Self {
-        TransformationMatrix::translation(by) * self
+    fn translate<T>(&self, by: T) -> Self
+    where
+        Coord: From<T>,
+    {
+        TransformationMatrix::translation(Coord::from(by)) * self
     }
 
-    fn scale(&self, by: Coord) -> Self {
-        TransformationMatrix::scaling(by) * self
+    fn scale<T>(&self, by: T) -> Self
+    where
+        Coord: From<T>,
+    {
+        TransformationMatrix::scaling(Coord::from(by)) * self
     }
 
     /// Rotate point around some axis by some radians
@@ -107,7 +113,7 @@ impl Transform for Coord {}
 
 impl Transform for Vector {
     // Vectors cannot be translated
-    fn translate(&self, _: Coord) -> Self {
+    fn translate<T>(&self, _: T) -> Self {
         self.clone()
     }
 }
