@@ -17,6 +17,10 @@ macro_rules! pointCommons {
             pub fn new(x: f64, y: f64, z: f64) -> Self {
                 Self { x, y, z }
             }
+
+            pub fn scalar_mult(&self, lambda: f64) -> Self {
+                Self::from((self.x * lambda, self.y * lambda, self.z * lambda))
+            }
         }
 
         impl Mul<f64> for $typename {
