@@ -1,4 +1,4 @@
-use std::ops::{Div, Mul};
+use std::ops::{Add, Div, Mul, Sub};
 
 use crate::approx::approx;
 use crate::point::vector::Vector;
@@ -16,11 +16,25 @@ impl Coord {
         Vector::new(to.x - self.x, to.y - self.y, to.z - self.z)
     }
 
-    pub fn add_vector(self, vec: &Vector) -> Coord {
+    pub fn add_vector(&self, vec: &Vector) -> Coord {
         Coord::new(self.x + vec.x, self.y + vec.y, self.z + vec.z)
     }
 
-    pub fn subtract_vector(self, vec: &Vector) -> Coord {
+    pub fn subtract_vector(&self, vec: &Vector) -> Coord {
+        Coord::new(self.x - vec.x, self.y - vec.y, self.z - vec.z)
+    }
+}
+
+impl Add<Vector> for Coord {
+    type Output = Coord;
+    fn add(self, vec: Vector) -> Self::Output {
+        Coord::new(self.x + vec.x, self.y + vec.y, self.z + vec.z)
+    }
+}
+
+impl Sub<Vector> for Coord {
+    type Output = Coord;
+    fn sub(self, vec: Vector) -> Self::Output {
         Coord::new(self.x - vec.x, self.y - vec.y, self.z - vec.z)
     }
 }
