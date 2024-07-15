@@ -10,6 +10,7 @@ use transformations::Transform;
 pub(crate) mod approx;
 pub(crate) mod matrix;
 pub(crate) mod point;
+pub(crate) mod ray;
 pub(crate) mod transformations;
 
 const H: usize = 1000;
