@@ -1,5 +1,5 @@
 pub(crate) fn rgb_percentage_to_u8(f: f64) -> Option<u8> {
-    if f > 1.0 || f < 0.0 {
+    if !(0.0..=1.0).contains(&f) {
         return None;
     }
 
