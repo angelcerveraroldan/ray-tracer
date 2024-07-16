@@ -1,7 +1,4 @@
-use std::{
-    f64::{self, consts::PI},
-    usize,
-};
+use std::f64::{self, consts::PI};
 
 use image::{canvas::Canvas, color};
 use point::coord::Coord;

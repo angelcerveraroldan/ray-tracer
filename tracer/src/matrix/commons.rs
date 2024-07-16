@@ -1,4 +1,4 @@
-use crate::matrix::{square2, square3, square4};
+use crate::matrix::{square3, square4};
 
 macro_rules! sqmatrix_commons {
     ($($t:ty),*) => {
