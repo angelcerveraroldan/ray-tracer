@@ -9,10 +9,10 @@ pub type Matrix3x3 = SquareMatrix<3>;
 #[macro_export]
 macro_rules! matrix_3x3 {
     ($($($element:expr),*;)*) => {
-        crate::matrix::square3::Matrix3x3::from(vec![$( vec![ $($element as f64),* ] ), *])
+        $crate::matrix::square3::Matrix3x3::from(vec![$( vec![ $($element as f64),* ] ), *])
     };
     ($($($element:expr),*);*) => {
-        crate::matrix::square3::Matrix3x3::from(vec![$( vec![ $($element as f64),* ] ), *])
+        $crate::matrix::square3::Matrix3x3::from(vec![$( vec![ $($element as f64),* ] ), *])
     };
 }
 

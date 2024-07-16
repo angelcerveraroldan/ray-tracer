@@ -9,10 +9,10 @@ pub type Matrix4x4 = SquareMatrix<4>;
 #[macro_export]
 macro_rules! matrix_4x4 {
     ($($($element:expr),*;)*) => {
-        crate::matrix::square4::Matrix4x4::from(vec![$( vec![ $($element as f64),* ] ), *])
+        $crate::matrix::square4::Matrix4x4::from(vec![$( vec![ $($element as f64),* ] ), *])
     };
     ($($($element:expr),*);*) => {
-        crate::matrix::square4::Matrix4x4::from(vec![$( vec![ $($element as f64),* ] ), *])
+        $crate::matrix::square4::Matrix4x4::from(vec![$( vec![ $($element as f64),* ] ), *])
     };
 }
 
