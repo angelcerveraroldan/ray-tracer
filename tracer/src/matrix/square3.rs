@@ -2,28 +2,32 @@ use std::ops::Mul;
 
 use crate::point::{coord::Coord, vector::Vector};
 
-use super::SquareMatrix;
+use super::{square2::Matrix2x2, SquareMatrix};
 
 pub type Matrix3x3 = SquareMatrix<3>;
 
 #[macro_export]
 macro_rules! matrix_3x3 {
     ($($($element:expr),*;)*) => {
-        $crate::matrix::square3::Matrix3x3::from(vec![$( vec![ $($element as f64),* ] ), *])
+        $crate::matrix::square3::Matrix3x3::from([$( [ $($element as f64),* ] ), *])
     };
     ($($($element:expr),*);*) => {
-        $crate::matrix::square3::Matrix3x3::from(vec![$( vec![ $($element as f64),* ] ), *])
+        $crate::matrix::square3::Matrix3x3::from([$( [ $($element as f64),* ] ), *])
     };
 }
 
 impl Matrix3x3 {
     pub fn remove_indexes(&self, row: usize, col: usize) -> crate::matrix::square2::Matrix2x2 {
-        let mut data = self.data.clone();
-        data.remove(row);
-        for r in data.iter_mut() {
-            r.remove(col);
+        let rows = (0..3).filter(|&x| x != row).enumerate();
+        let cols = (0..3).filter(|&x| x != col).enumerate().collect::<Vec<_>>();
+        let mut other = Matrix2x2::default();
+        for (index_r, row_index) in rows {
+            for (index_c, col_index) in &cols {
+                println!("Setting: {:?}", (index_r, *index_c));
+                other[(index_r, *index_c)] = self[(row_index, *col_index)];
+            }
         }
-        crate::matrix::square2::Matrix2x2::from(data)
+        other
     }
 
     // Ther may be a way to optimize this (diagonals method)
@@ -91,7 +95,7 @@ mod matrix_3x3_test {
             1, 2, 3;
             1, 2, 3];
 
-        let m2 = Matrix3x3::new([[1.0, 2.0, 3.0], [1.0, 2.0, 3.0], [1.0, 2.0, 3.0]]);
+        let m2 = Matrix3x3::from([[1.0, 2.0, 3.0], [1.0, 2.0, 3.0], [1.0, 2.0, 3.0]]);
 
         assert_eq!(m1, m2);
 

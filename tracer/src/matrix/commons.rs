@@ -18,15 +18,14 @@ macro_rules! sqmatrix_commons {
                 if  det == 0.0 { return None; }
                 let det = 1.0/det;
 
-                let data = (0..size)
-                   .map(|row_index| {
-                        (0..size)
-                            .map(|col_index| self.cofactor(row_index, col_index) * det)
-                            .collect()
-                    })
-                    .collect::<Vec<Vec<f64>>>();
+                let mut inv = Self::default();
+                for i in 0..size {
+                    for c in 0..size {
+                        inv[(i,c)] = self.cofactor(i, c) * det;
+                    }
+                }
 
-                Some(Self::from(data).transpose())
+                Some(inv.transpose())
             }
        })*
     };

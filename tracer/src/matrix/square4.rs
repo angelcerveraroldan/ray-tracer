@@ -9,10 +9,10 @@ pub type Matrix4x4 = SquareMatrix<4>;
 #[macro_export]
 macro_rules! matrix_4x4 {
     ($($($element:expr),*;)*) => {
-        $crate::matrix::square4::Matrix4x4::from(vec![$( vec![ $($element as f64),* ] ), *])
+        $crate::matrix::square4::Matrix4x4::from([$( [ $($element as f64),* ] ), *])
     };
     ($($($element:expr),*);*) => {
-        $crate::matrix::square4::Matrix4x4::from(vec![$( vec![ $($element as f64),* ] ), *])
+        $crate::matrix::square4::Matrix4x4::from([$( [ $($element as f64),* ] ), *])
     };
 }
 
@@ -36,12 +36,15 @@ impl Mul for Matrix4x4 {
 
 impl Matrix4x4 {
     pub fn remove_indexes(&self, row: usize, col: usize) -> crate::matrix::square3::Matrix3x3 {
-        let mut data = self.data.clone();
-        data.remove(row);
-        for r in data.iter_mut() {
-            r.remove(col);
+        let rows = (0..4).filter(|&x| x != row).enumerate();
+        let cols = (0..4).filter(|&x| x != col).enumerate().collect::<Vec<_>>();
+        let mut other = Matrix3x3::default();
+        for (index_r, row_index) in rows {
+            for (index_c, col_index) in &cols {
+                other[(index_r, *index_c)] = self[(row_index, *col_index)];
+            }
         }
-        Matrix3x3::from(data)
+        other
     }
 
     pub fn det(&self) -> f64 {
@@ -109,7 +112,7 @@ mod matrix_4x4_test {
             1, 2, 3, 4;
             1, 2, 3, 4];
 
-        let m2 = Matrix4x4::new([
+        let m2 = Matrix4x4::from([
             [1.0, 2.0, 3.0, 4.0],
             [1.0, 2.0, 3.0, 4.0],
             [1.0, 2.0, 3.0, 4.0],

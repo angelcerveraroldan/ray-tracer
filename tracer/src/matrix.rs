@@ -15,7 +15,7 @@ use std::ops::{Index, IndexMut, Mul};
 /// a lot of the methods implemented would need a lot of
 /// optimizing for a larger matrix
 pub struct SquareMatrix<const S: usize> {
-    pub data: Vec<Vec<f64>>,
+    pub data: [[f64; S]; S],
 }
 
 impl<const S: usize> PartialEq for SquareMatrix<S> {
@@ -37,26 +37,20 @@ impl<const S: usize> PartialEq for SquareMatrix<S> {
 
 impl<const S: usize> Default for SquareMatrix<S> {
     fn default() -> Self {
-        let row = vec![0.0; S];
-        let data = vec![row; S];
-        Self { data }
-    }
-}
-
-impl<const S: usize> From<Vec<Vec<f64>>> for SquareMatrix<S> {
-    fn from(data: Vec<Vec<f64>>) -> Self {
+        let row = [0.0; S];
+        let data = [row; S];
         Self { data }
     }
 }
 
 impl<const S: usize> From<[[f64; S]; S]> for SquareMatrix<S> {
     fn from(data: [[f64; S]; S]) -> Self {
-        Self::new(data)
+        Self { data }
     }
 }
 
 impl<const S: usize> Index<usize> for SquareMatrix<S> {
-    type Output = Vec<f64>;
+    type Output = [f64; S];
     fn index(&self, index: usize) -> &Self::Output {
         self.data.index(index)
     }
@@ -86,13 +80,8 @@ impl<const S: usize> SquareMatrix<S> {
         (S, S)
     }
 
-    pub fn new(data: [[f64; S]; S]) -> SquareMatrix<S> {
-        let data = data.iter().map(Vec::from).collect::<Vec<_>>();
-        Self { data }
-    }
-
     pub fn get_row(&self, id: usize) -> Vec<f64> {
-        self.data.index(id).clone()
+        self.data.index(id).to_vec()
     }
 
     pub fn get_col(&self, id: usize) -> Vec<f64> {
@@ -103,12 +92,13 @@ impl<const S: usize> SquareMatrix<S> {
     where
         F: Fn(&f64) -> f64,
     {
-        SquareMatrix::<S>::from(
-            self.data
-                .iter()
-                .map(|row| row.iter().map(|x| f(x)).collect::<Vec<f64>>())
-                .collect::<Vec<Vec<f64>>>(),
-        )
+        let mut other = SquareMatrix::default();
+        for i in 0..S {
+            for j in 0..S {
+                other[(i, j)] = f(&self[(i, j)]);
+            }
+        }
+        other
     }
 
     pub fn mut_map_elements<F>(&mut self, f: F)
