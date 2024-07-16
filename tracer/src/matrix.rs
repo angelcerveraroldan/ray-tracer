@@ -4,10 +4,7 @@ pub mod square2;
 pub mod square3;
 pub mod square4;
 
-use std::{
-    ops::{Index, IndexMut, Mul},
-    usize,
-};
+use std::ops::{Index, IndexMut, Mul};
 
 #[derive(Debug, Clone)]
 /// More generic struct for a square matrix
@@ -90,7 +87,7 @@ impl<const S: usize> SquareMatrix<S> {
     }
 
     pub fn new(data: [[f64; S]; S]) -> SquareMatrix<S> {
-        let data = data.iter().map(|row| Vec::from(row)).collect::<Vec<_>>();
+        let data = data.iter().map(Vec::from).collect::<Vec<_>>();
         Self { data }
     }
 
@@ -109,7 +106,7 @@ impl<const S: usize> SquareMatrix<S> {
         SquareMatrix::<S>::from(
             self.data
                 .iter()
-                .map(|row| row.iter().map(|x| f(&x)).collect::<Vec<f64>>())
+                .map(|row| row.iter().map(|x| f(x)).collect::<Vec<f64>>())
                 .collect::<Vec<Vec<f64>>>(),
         )
     }
