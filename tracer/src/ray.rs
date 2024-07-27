@@ -15,6 +15,16 @@ impl Ray {
     }
 }
 
+impl<A, B> From<(A, B)> for Ray
+where
+    Coord: From<A>,
+    Vector: From<B>,
+{
+    fn from((fc, fr): (A, B)) -> Self {
+        Ray::new(Coord::from(fc), Vector::from(fr))
+    }
+}
+
 #[cfg(test)]
 mod test_ray {
     use crate::point::{coord::Coord, vector::Vector};
