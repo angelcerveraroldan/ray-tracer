@@ -12,20 +12,20 @@ pub struct Vector {
 }
 
 impl Vector {
-    fn magnitude(&self) -> f64 {
+    pub fn magnitude(&self) -> f64 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
 
-    fn normalize(&self) -> Self {
+    pub fn normalize(&self) -> Self {
         let magnitude = self.magnitude();
         Self::new(self.x / magnitude, self.y / magnitude, self.z / magnitude)
     }
 
-    fn dot(&self, rhs: &Vector) -> f64 {
+    pub fn dot(&self, rhs: &Vector) -> f64 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
-    fn cross_product(&self, rhs: &Vector) -> Vector {
+    pub fn cross_product(&self, rhs: &Vector) -> Vector {
         Vector::new(
             self.y * rhs.z - self.z * rhs.y,
             self.z * rhs.x - self.x * rhs.z,
