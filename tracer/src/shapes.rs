@@ -18,7 +18,7 @@ pub trait Hittable {
 }
 
 impl Shapes {
-    fn hit<'a>(&'a self, ray: &Ray) -> Intersections<'a> {
+    fn get_intersections<'a>(&'a self, ray: &Ray) -> Intersections<'a> {
         self.hit_times(ray)
             .into_iter()
             .map(|time| Intersection::new(time, self))
@@ -35,7 +35,7 @@ mod test_shapes {
     #[test]
     fn basic_hits() {
         let ray = crate::ray::Ray::from(((0, 0, -5), (0, 0, 1)));
-        let hits = SHAPE.hit(&ray);
+        let hits = SHAPE.get_intersections(&ray);
         assert_eq!(hits[0].time, 4.0);
         assert_eq!(hits[1].time, 6.0);
         assert_eq!(hits[0].shape, &SHAPE);
@@ -44,7 +44,7 @@ mod test_shapes {
     #[test]
     fn tangent_intersection() {
         let ray = crate::ray::Ray::from(((0, 1, -5), (0, 0, 1)));
-        let hits = SHAPE.hit(&ray);
+        let hits = SHAPE.get_intersections(&ray);
         assert_eq!(hits[0].time, 5.0);
         assert_eq!(hits[1].time, 5.0);
         assert_eq!(hits[0].shape, &SHAPE);
