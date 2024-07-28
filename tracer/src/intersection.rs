@@ -22,6 +22,19 @@ impl<'a> Intersections<'a> {
     pub fn new(intersections: Vec<Intersection<'a>>) -> Self {
         Self { intersections }
     }
+
+    pub fn hit(&self) -> Option<&Intersection<'a>> {
+        let mut f = None;
+        let mut min_time = f64::INFINITY;
+        for inter in &self.intersections {
+            let time = inter.time;
+            if time < min_time && time > 0.0 {
+                min_time = time;
+                f = Some(inter);
+            }
+        }
+        f
+    }
 }
 
 impl<'a> Index<usize> for Intersections<'a> {
