@@ -1,3 +1,5 @@
+use std::ops::Index;
+
 use crate::shapes::Shapes;
 
 #[derive(Debug)]
@@ -12,4 +14,19 @@ impl<'a> Intersection<'a> {
     }
 }
 
-pub type Intersections<'a> = Vec<Intersection<'a>>;
+pub struct Intersections<'a> {
+    intersections: Vec<Intersection<'a>>,
+}
+
+impl<'a> Intersections<'a> {
+    pub fn new(intersections: Vec<Intersection<'a>>) -> Self {
+        Self { intersections }
+    }
+}
+
+impl<'a> Index<usize> for Intersections<'a> {
+    type Output = Intersection<'a>;
+    fn index(&self, index: usize) -> &Self::Output {
+        self.intersections.index(index)
+    }
+}
