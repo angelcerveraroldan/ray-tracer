@@ -5,6 +5,7 @@ use point::coord::Coord;
 use transformations::Transform;
 
 pub(crate) mod approx;
+pub(crate) mod intersection;
 pub(crate) mod matrix;
 pub(crate) mod point;
 pub(crate) mod ray;
