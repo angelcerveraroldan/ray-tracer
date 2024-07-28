@@ -11,11 +11,11 @@ impl Sphere {
         let a = ray.dir.dot(&ray.dir);
         let b = 2.0 * ray.dir.dot(&sphere_ray);
         let c = sphere_ray.dot(&sphere_ray) - 1.0;
-        let disriminant = (b * b) - (4.0 * a * c);
-        if disriminant < 0.0 {
+        let discriminant = (b * b) - (4.0 * a * c);
+        if discriminant < 0.0 {
             return (None, None);
         }
-        let sqrt = disriminant.sqrt();
+        let sqrt = discriminant.sqrt();
         (Some((-b - sqrt) / (2.0 * a)), Some((-b + sqrt) / (2.0 * a)))
     }
 }
