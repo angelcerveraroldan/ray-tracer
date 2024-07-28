@@ -1,7 +1,10 @@
 use enum_dispatch::enum_dispatch;
 use sphere::Sphere;
 
-use crate::{intersection::Intersection, intersection::Intersections, ray::Ray};
+use crate::{
+    intersection::{intersections::IntersectionTracker, single_intersection::SingleIntersection},
+    ray::Ray,
+};
 
 pub mod sphere;
 
@@ -18,11 +21,11 @@ pub trait Hittable {
 }
 
 impl Shapes {
-    fn get_intersections<'a>(&'a self, ray: &Ray) -> Intersections<'a> {
-        Intersections::new(
+    fn get_intersections<'a>(&'a self, ray: &Ray) -> IntersectionTracker<'a> {
+        IntersectionTracker::new(
             self.hit_times(ray)
                 .into_iter()
-                .map(|time| Intersection::new(time, self))
+                .map(|time| SingleIntersection::new(time, self))
                 .collect(),
         )
     }
