@@ -36,6 +36,10 @@ impl TransformationMatrix {
         }
     }
 
+    pub fn inverse(&self) -> Option<crate::matrix::square4::Matrix4x4> {
+        self.matrix.inverse()
+    }
+
     /// Generate a 4x4 translation matrix
     pub fn translation(by: Coord) -> Matrix4x4 {
         let mut m = Matrix4x4::identity();
