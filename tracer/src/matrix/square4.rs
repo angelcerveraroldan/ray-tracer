@@ -1,6 +1,9 @@
 use square3::Matrix3x3;
 
-use crate::point::{coord::Coord, vector::Vector};
+use crate::{
+    point::{coord::Coord, vector::Vector},
+    ray::Ray,
+};
 
 use super::*;
 
@@ -59,6 +62,9 @@ impl Matrix4x4 {
     MATRIX OPERATIONS FOR VECTORS / COORDS
 ***********************************************/
 
+// TODO: The way the multiplication is implemented is very bad, a matrix needs not be
+// consumed to mulitply a vector ...
+
 impl Mul<Vector> for Matrix4x4 {
     type Output = Vector;
     fn mul(self, rhs: Vector) -> Self::Output {
@@ -96,6 +102,15 @@ impl Mul<&Coord> for Matrix4x4 {
         let y = self[(1, 0)] * rhs.x + self[(1, 1)] * rhs.y + self[(1, 2)] * rhs.z + self[(1, 3)];
         let z = self[(2, 0)] * rhs.x + self[(2, 1)] * rhs.y + self[(2, 2)] * rhs.z + self[(2, 3)];
         Coord::new(x, y, z)
+    }
+}
+
+impl Mul<&Ray> for Matrix4x4 {
+    type Output = Ray;
+    fn mul(self, rhs: &Ray) -> Self::Output {
+        let new_origin = self.clone().mul(&rhs.origin);
+        let new_direction = self.mul(&rhs.dir);
+        Ray::new(new_origin, new_direction)
     }
 }
 

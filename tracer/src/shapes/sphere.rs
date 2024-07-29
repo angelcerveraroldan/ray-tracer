@@ -1,9 +1,14 @@
-use crate::{point::vector::Vector, ray::Ray};
+use crate::{
+    matrix::square4::Matrix4x4, point::vector::Vector, ray::Ray,
+    transformations::TransformationMatrix,
+};
 
 use super::Hittable;
 
-#[derive(Debug, Default, PartialEq)]
-pub struct Sphere {}
+#[derive(Debug, PartialEq, Default)]
+pub struct Sphere {
+    pub transformation: TransformationMatrix,
+}
 
 impl Hittable for Sphere {
     fn hit_times(&self, ray: &Ray) -> Vec<f64> {
@@ -23,7 +28,7 @@ impl Hittable for Sphere {
 #[cfg(test)]
 mod test_hittable_sphere {
     use std::vec;
-
+    use crate::point::coord::Coord;
     use super::*;
 
     #[test]
@@ -59,5 +64,12 @@ mod test_hittable_sphere {
         let ray = crate::ray::Ray::from(((0, 0, 5), (0, 0, 1)));
         let hits = Sphere::default().hit_times(&ray);
         assert_eq!(hits, vec![-6.0, -4.0]);
+    }
+
+    #[test]
+    fn transform_translate() {
+        let mut sphere = Sphere::default();
+        sphere.transformation.translate((2, 3, 4));
+        assert_eq!(sphere.transformation.matrix, TransformationMatrix::translation(Coord::from((2, 3, 4))));
     }
 }
