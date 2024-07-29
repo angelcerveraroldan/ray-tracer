@@ -1,9 +1,19 @@
-use crate::{point::vector::Vector, ray::Ray};
+use crate::{matrix::square4::Matrix4x4, point::vector::Vector, ray::Ray};
 
 use super::Hittable;
 
-#[derive(Debug, Default, PartialEq)]
-pub struct Sphere {}
+#[derive(Debug, PartialEq)]
+pub struct Sphere {
+    pub transformation: Matrix4x4,
+}
+
+impl Default for Sphere {
+    fn default() -> Self {
+        Sphere {
+            transformation: Matrix4x4::identity(),
+        }
+    }
+}
 
 impl Hittable for Sphere {
     fn hit_times(&self, ray: &Ray) -> Vec<f64> {

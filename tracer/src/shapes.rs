@@ -35,23 +35,27 @@ impl Shapes {
 mod test_shapes {
     use super::*;
 
-    const SHAPE: Shapes = Shapes::Sphere(sphere::Sphere {});
+    fn make_shape() -> Shapes {
+        Shapes::Sphere(sphere::Sphere::default())
+    }
 
     #[test]
     fn basic_hits() {
+        let shape = make_shape();
         let ray = crate::ray::Ray::from(((0, 0, -5), (0, 0, 1)));
-        let hits = SHAPE.get_intersections(&ray);
+        let hits = shape.get_intersections(&ray);
         assert_eq!(hits[0].time, 4.0);
         assert_eq!(hits[1].time, 6.0);
-        assert_eq!(hits[0].shape, &SHAPE);
+        assert_eq!(hits[0].shape, &shape);
     }
 
     #[test]
     fn tangent_intersection() {
+        let shape = make_shape();
         let ray = crate::ray::Ray::from(((0, 1, -5), (0, 0, 1)));
-        let hits = SHAPE.get_intersections(&ray);
+        let hits = shape.get_intersections(&ray);
         assert_eq!(hits[0].time, 5.0);
         assert_eq!(hits[1].time, 5.0);
-        assert_eq!(hits[0].shape, &SHAPE);
+        assert_eq!(hits[0].shape, &shape);
     }
 }
