@@ -62,6 +62,7 @@ impl TransformationMatrix {
         id4x4
     }
 
+    /// Add scaling to the current matrix
     pub fn scale<C>(&mut self, by: C) -> &mut Self
     where
         Coord: From<C>,
@@ -123,6 +124,7 @@ impl TransformationMatrix {
         self
     }
 
+    /// Apply all of the translations built up to an object
     pub fn apply<A>(&self, object: &A) -> A
     where
         crate::matrix::square4::Matrix4x4: for<'a> Mul<&'a A, Output = A>,
