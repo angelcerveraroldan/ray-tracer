@@ -45,30 +45,12 @@ impl TransformationMatrix {
         m
     }
 
-    /// Add translation to the current matrix
-    pub fn translate<C>(&mut self, by: C) -> &mut Self
-    where
-        Coord: From<C>,
-    {
-        self.matrix = Self::translation(Coord::from(by)) * self.matrix;
-        self
-    }
-
     fn scaling(by: Coord) -> Matrix4x4 {
         let mut id4x4 = Matrix4x4::identity();
         id4x4.mutate_to((0, 0), by.x);
         id4x4.mutate_to((1, 1), by.y);
         id4x4.mutate_to((2, 2), by.z);
         id4x4
-    }
-
-    /// Add scaling to the current matrix
-    pub fn scale<C>(&mut self, by: C) -> &mut Self
-    where
-        Coord: From<C>,
-    {
-        self.matrix = Self::scaling(Coord::from(by)) * self.matrix;
-        self
     }
 
     fn rotation_x(rads: f64) -> Matrix4x4 {
@@ -107,6 +89,24 @@ impl TransformationMatrix {
         id4x4.mutate_to((1, 1), f64::cos(rads));
 
         id4x4
+    }
+
+    /// Add translation to the current matrix
+    pub fn translate<C>(&mut self, by: C) -> &mut Self
+    where
+        Coord: From<C>,
+    {
+        self.matrix = Self::translation(Coord::from(by)) * self.matrix;
+        self
+    }
+
+    /// Add scaling to the current matrix
+    pub fn scale<C>(&mut self, by: C) -> &mut Self
+    where
+        Coord: From<C>,
+    {
+        self.matrix = Self::scaling(Coord::from(by)) * self.matrix;
+        self
     }
 
     pub fn rotate_x(&mut self, rads: f64) -> &mut Self {
