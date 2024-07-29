@@ -14,9 +14,27 @@ use crate::{
 * */
 
 /// Helper Structure used to genrate transformation matrices
-struct TransformationMatrix;
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct TransformationMatrix {
+    pub matrix: Matrix4x4,
+}
+
+impl Default for TransformationMatrix {
+    fn default() -> Self {
+        Self {
+            matrix: Matrix4x4::identity(),
+        }
+    }
+}
 
 impl TransformationMatrix {
+    pub fn identity() -> Self {
+        Self {
+            ..Default::default()
+        }
+    }
+
+    /// Generate a 4x4 translation matrix
     fn translation(by: Coord) -> Matrix4x4 {
         let mut m = Matrix4x4::identity();
         m.mutate_to((0, 3), by.x);
@@ -25,12 +43,29 @@ impl TransformationMatrix {
         m
     }
 
+    /// Add translation to the current matrix
+    pub fn translate<C>(&mut self, by: C) -> &mut Self
+    where
+        Coord: From<C>,
+    {
+        self.matrix = Self::translation(Coord::from(by)) * self.matrix;
+        self
+    }
+
     fn scaling(by: Coord) -> Matrix4x4 {
         let mut id4x4 = Matrix4x4::identity();
         id4x4.mutate_to((0, 0), by.x);
         id4x4.mutate_to((1, 1), by.y);
         id4x4.mutate_to((2, 2), by.z);
         id4x4
+    }
+
+    pub fn scale<C>(&mut self, by: C) -> &mut Self
+    where
+        Coord: From<C>,
+    {
+        self.matrix = Self::scaling(Coord::from(by)) * self.matrix;
+        self
     }
 
     fn rotation_x(rads: f64) -> Matrix4x4 {
@@ -69,6 +104,28 @@ impl TransformationMatrix {
         id4x4.mutate_to((1, 1), f64::cos(rads));
 
         id4x4
+    }
+
+    pub fn rotate_x(&mut self, rads: f64) -> &mut Self {
+        self.matrix = Self::rotation_x(rads) * self.matrix;
+        self
+    }
+
+    pub fn rotate_y(&mut self, rads: f64) -> &mut Self {
+        self.matrix = Self::rotation_y(rads) * self.matrix;
+        self
+    }
+
+    pub fn rotate_z(&mut self, rads: f64) -> &mut Self {
+        self.matrix = Self::rotation_z(rads) * self.matrix;
+        self
+    }
+
+    pub fn apply<A>(&self, object: &A) -> A
+    where
+        crate::matrix::square4::Matrix4x4: for<'a> Mul<&'a A, Output = A>,
+    {
+        self.matrix * object
     }
 }
 
@@ -209,5 +266,17 @@ mod test_transformations {
             p.rotate(Axis::Z, PI / 4.0)
         );
         assert_eq!(Coord::from((-1.0, 0.0, 0.0)), p.rotate(Axis::Z, PI / 2.0));
+    }
+
+    #[test]
+    fn build_translations() {
+        let p = Coord::from((0, 1, 0));
+        let np = p.scale((2.0, 1.0, 2.0)).translate((0.0, 0.0, 1.0));
+        let mut transformation_matrix = TransformationMatrix::identity();
+        transformation_matrix
+            .scale((2.0, 1.0, 2.0))
+            .translate((0.0, 0.0, 1.0));
+        let op = transformation_matrix.apply(&p);
+        assert_eq!(op, np);
     }
 }

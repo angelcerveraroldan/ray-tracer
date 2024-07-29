@@ -6,7 +6,7 @@ pub mod square4;
 
 use std::ops::{Index, IndexMut, Mul};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 /// More generic struct for a square matrix
 ///
 /// For this use case, we will assume that S = 2, 3, or 4

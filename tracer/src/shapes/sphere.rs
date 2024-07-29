@@ -1,18 +1,13 @@
-use crate::{matrix::square4::Matrix4x4, point::vector::Vector, ray::Ray};
+use crate::{
+    matrix::square4::Matrix4x4, point::vector::Vector, ray::Ray,
+    transformations::TransformationMatrix,
+};
 
 use super::Hittable;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Default)]
 pub struct Sphere {
-    pub transformation: Matrix4x4,
-}
-
-impl Default for Sphere {
-    fn default() -> Self {
-        Sphere {
-            transformation: Matrix4x4::identity(),
-        }
-    }
+    pub transformation: TransformationMatrix,
 }
 
 impl Hittable for Sphere {
