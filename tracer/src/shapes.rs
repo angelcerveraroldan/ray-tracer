@@ -21,7 +21,7 @@ pub trait Hittable {
 }
 
 impl Shapes {
-    fn get_intersections<'a>(&'a self, ray: &Ray) -> IntersectionTracker<'a> {
+    fn get_intersections(&self, ray: &Ray) -> IntersectionTracker {
         IntersectionTracker::new(
             self.hit_times(ray)
                 .into_iter()
