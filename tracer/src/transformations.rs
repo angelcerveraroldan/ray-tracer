@@ -45,6 +45,7 @@ impl TransformationMatrix {
         m
     }
 
+    /// Generate a 4x4 scaling matrix
     fn scaling(by: Coord) -> Matrix4x4 {
         let mut id4x4 = Matrix4x4::identity();
         id4x4.mutate_to((0, 0), by.x);
@@ -53,6 +54,7 @@ impl TransformationMatrix {
         id4x4
     }
 
+    /// Generate a matrix to rotate around the x axis by some radians
     fn rotation_x(rads: f64) -> Matrix4x4 {
         let mut id4x4 = Matrix4x4::identity();
 
@@ -65,7 +67,7 @@ impl TransformationMatrix {
         id4x4
     }
 
-    /// Rotate around the y axis by some radians
+    /// Generate a matrix to rotate around the y axis by some radians
     fn rotation_y(rads: f64) -> Matrix4x4 {
         let mut id4x4 = Matrix4x4::identity();
 
@@ -78,7 +80,7 @@ impl TransformationMatrix {
         id4x4
     }
 
-    /// Rotate around the z axis by some radians
+    /// Generate a matrix to rotate around the z axis by some radians
     fn rotation_z(rads: f64) -> Matrix4x4 {
         let mut id4x4 = Matrix4x4::identity();
 
@@ -109,18 +111,14 @@ impl TransformationMatrix {
         self
     }
 
-    pub fn rotate_x(&mut self, rads: f64) -> &mut Self {
-        self.matrix = Self::rotation_x(rads) * self.matrix;
-        self
-    }
-
-    pub fn rotate_y(&mut self, rads: f64) -> &mut Self {
-        self.matrix = Self::rotation_y(rads) * self.matrix;
-        self
-    }
-
-    pub fn rotate_z(&mut self, rads: f64) -> &mut Self {
-        self.matrix = Self::rotation_z(rads) * self.matrix;
+    /// Add a rotation to the current matrix
+    pub fn rotate(&mut self, around: Axis, by: f64) -> &mut Self {
+        let roatation_matrix = match around {
+            Axis::X => Self::rotation_x(by),
+            Axis::Y => Self::rotation_y(by),
+            Axis::Z => Self::rotation_z(by),
+        };
+        self.matrix = roatation_matrix * self.matrix;
         self
     }
 
