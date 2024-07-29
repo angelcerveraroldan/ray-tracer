@@ -3,6 +3,7 @@ use std::ops::Mul;
 use crate::{
     matrix::square4::Matrix4x4,
     point::{coord::Coord, vector::Vector},
+    ray::Ray,
 };
 
 /*
@@ -106,6 +107,16 @@ where
         };
 
         roatation_matrix * self
+    }
+}
+
+impl Transform for Ray {
+    fn translate<T>(&self, by: T) -> Self
+    where
+        Coord: From<T>,
+    {
+        let new_origin = self.origin.translate(by);
+        Self::new(new_origin, self.dir.clone())
     }
 }
 
