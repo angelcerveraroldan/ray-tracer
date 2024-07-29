@@ -37,7 +37,7 @@ impl TransformationMatrix {
     }
 
     /// Generate a 4x4 translation matrix
-    fn translation(by: Coord) -> Matrix4x4 {
+    pub fn translation(by: Coord) -> Matrix4x4 {
         let mut m = Matrix4x4::identity();
         m.mutate_to((0, 3), by.x);
         m.mutate_to((1, 3), by.y);
@@ -46,7 +46,7 @@ impl TransformationMatrix {
     }
 
     /// Generate a 4x4 scaling matrix
-    fn scaling(by: Coord) -> Matrix4x4 {
+    pub fn scaling(by: Coord) -> Matrix4x4 {
         let mut id4x4 = Matrix4x4::identity();
         id4x4.mutate_to((0, 0), by.x);
         id4x4.mutate_to((1, 1), by.y);
