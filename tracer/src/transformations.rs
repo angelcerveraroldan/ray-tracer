@@ -13,7 +13,9 @@ use crate::{
 *
 * */
 
-/// Helper Structure used to genrate transformation matrices
+/// Structure used to genrate matrices for translations
+/// and to build more complex matrices that will transform
+/// objects in many ways
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct TransformationMatrix {
     pub matrix: Matrix4x4,
