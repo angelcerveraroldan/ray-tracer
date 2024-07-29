@@ -139,6 +139,14 @@ pub enum Axis {
     Z,
 }
 
+/// Apply a *single* transformation to an object
+///
+/// Since transformations are just 4x4 matrices, the object must be able to be multiplied with a
+/// 4x4 matrix
+///
+/// To apply many transformations, you can chain the functions in this trait. If you want to run
+/// the same sequence of transformations on many objects, it is more effiecnt to generate one
+/// matrix that will apply all of those transformations using the TransformationMatrix struct.
 pub trait Transform
 where
     Self: Sized,
