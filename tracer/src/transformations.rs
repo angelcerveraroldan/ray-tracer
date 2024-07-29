@@ -13,11 +13,31 @@ use crate::{
 *
 * */
 
-/// Helper Structure used to genrate transformation matrices
-struct TransformationMatrix;
+/// Structure used to genrate matrices for translations
+/// and to build more complex matrices that will transform
+/// objects in many ways
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct TransformationMatrix {
+    pub matrix: Matrix4x4,
+}
+
+impl Default for TransformationMatrix {
+    fn default() -> Self {
+        Self {
+            matrix: Matrix4x4::identity(),
+        }
+    }
+}
 
 impl TransformationMatrix {
-    fn translation(by: Coord) -> Matrix4x4 {
+    pub fn identity() -> Self {
+        Self {
+            ..Default::default()
+        }
+    }
+
+    /// Generate a 4x4 translation matrix
+    pub fn translation(by: Coord) -> Matrix4x4 {
         let mut m = Matrix4x4::identity();
         m.mutate_to((0, 3), by.x);
         m.mutate_to((1, 3), by.y);
@@ -25,7 +45,8 @@ impl TransformationMatrix {
         m
     }
 
-    fn scaling(by: Coord) -> Matrix4x4 {
+    /// Generate a 4x4 scaling matrix
+    pub fn scaling(by: Coord) -> Matrix4x4 {
         let mut id4x4 = Matrix4x4::identity();
         id4x4.mutate_to((0, 0), by.x);
         id4x4.mutate_to((1, 1), by.y);
@@ -33,6 +54,7 @@ impl TransformationMatrix {
         id4x4
     }
 
+    /// Generate a matrix to rotate around the x axis by some radians
     fn rotation_x(rads: f64) -> Matrix4x4 {
         let mut id4x4 = Matrix4x4::identity();
 
@@ -45,7 +67,7 @@ impl TransformationMatrix {
         id4x4
     }
 
-    /// Rotate around the y axis by some radians
+    /// Generate a matrix to rotate around the y axis by some radians
     fn rotation_y(rads: f64) -> Matrix4x4 {
         let mut id4x4 = Matrix4x4::identity();
 
@@ -58,7 +80,7 @@ impl TransformationMatrix {
         id4x4
     }
 
-    /// Rotate around the z axis by some radians
+    /// Generate a matrix to rotate around the z axis by some radians
     fn rotation_z(rads: f64) -> Matrix4x4 {
         let mut id4x4 = Matrix4x4::identity();
 
@@ -70,6 +92,43 @@ impl TransformationMatrix {
 
         id4x4
     }
+
+    /// Add translation to the current matrix
+    pub fn translate<C>(&mut self, by: C) -> &mut Self
+    where
+        Coord: From<C>,
+    {
+        self.matrix = Self::translation(Coord::from(by)) * self.matrix;
+        self
+    }
+
+    /// Add scaling to the current matrix
+    pub fn scale<C>(&mut self, by: C) -> &mut Self
+    where
+        Coord: From<C>,
+    {
+        self.matrix = Self::scaling(Coord::from(by)) * self.matrix;
+        self
+    }
+
+    /// Add a rotation to the current matrix
+    pub fn rotate(&mut self, around: Axis, by: f64) -> &mut Self {
+        let roatation_matrix = match around {
+            Axis::X => Self::rotation_x(by),
+            Axis::Y => Self::rotation_y(by),
+            Axis::Z => Self::rotation_z(by),
+        };
+        self.matrix = roatation_matrix * self.matrix;
+        self
+    }
+
+    /// Apply all of the translations built up to an object
+    pub fn apply<A>(&self, object: &A) -> A
+    where
+        crate::matrix::square4::Matrix4x4: for<'a> Mul<&'a A, Output = A>,
+    {
+        self.matrix * object
+    }
 }
 
 pub enum Axis {
@@ -78,6 +137,14 @@ pub enum Axis {
     Z,
 }
 
+/// Apply a *single* transformation to an object
+///
+/// Since transformations are just 4x4 matrices, the object must be able to be multiplied with a
+/// 4x4 matrix
+///
+/// To apply many transformations, you can chain the functions in this trait. If you want to run
+/// the same sequence of transformations on many objects, it is more effiecnt to generate one
+/// matrix that will apply all of those transformations using the TransformationMatrix struct.
 pub trait Transform
 where
     Self: Sized,
@@ -209,5 +276,17 @@ mod test_transformations {
             p.rotate(Axis::Z, PI / 4.0)
         );
         assert_eq!(Coord::from((-1.0, 0.0, 0.0)), p.rotate(Axis::Z, PI / 2.0));
+    }
+
+    #[test]
+    fn build_translations() {
+        let p = Coord::from((0, 1, 0));
+        let np = p.scale((2.0, 1.0, 2.0)).translate((0.0, 0.0, 1.0));
+        let mut transformation_matrix = TransformationMatrix::identity();
+        transformation_matrix
+            .scale((2.0, 1.0, 2.0))
+            .translate((0.0, 0.0, 1.0));
+        let op = transformation_matrix.apply(&p);
+        assert_eq!(op, np);
     }
 }
