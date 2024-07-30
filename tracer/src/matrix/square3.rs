@@ -23,7 +23,7 @@ impl Matrix3x3 {
         let mut other = Matrix2x2::default();
         for (index_r, row_index) in rows {
             for (index_c, col_index) in &cols {
-                println!("Setting: {:?}", (index_r, *index_c));
+                // println!("Setting: {:?}", (index_r, *index_c));
                 other[(index_r, *index_c)] = self[(row_index, *col_index)];
             }
         }
