@@ -42,6 +42,19 @@ impl Vector {
             z: to.z - from.z,
         }
     }
+
+    pub fn sub(&self, Vector { x, y, z }: &Vector) -> Vector {
+        Vector {
+            x: self.x - x,
+            y: self.y - y,
+            z: self.z - z,
+        }
+    }
+
+    pub fn reflect(&self, around_normal: &Vector) -> Vector {
+        let dp = self.dot(around_normal);
+        self.sub(&around_normal.scalar_mult(2.0 * dp))
+    }
 }
 
 impl From<Coord> for Vector {
@@ -154,5 +167,16 @@ mod vector_test {
         let expected_cross_products = [(-1.0, 2.0, -1.0), (1.0, -2.0, 1.0)].map(Vector::from);
 
         assert_eq!(actual_cross_products, expected_cross_products);
+    }
+
+    #[test]
+    fn reflect_vector() {
+        let v = Vector::from((1, -1, 0));
+        let n = Vector::from((0, 1, 0));
+        assert_eq!(v.reflect(&n), Vector::from((1, 1, 0)));
+
+        let v = Vector::from((0, -1, 0));
+        let n = Vector::from((2.0f64.sqrt().powi(-1), 2.0f64.sqrt().powi(-1), 0.0));
+        assert_eq!(v.reflect(&n), Vector::from((1, 0, 0)));
     }
 }
