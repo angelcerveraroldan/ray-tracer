@@ -13,6 +13,7 @@ pub(crate) mod approx;
 pub(crate) mod intersection;
 pub(crate) mod matrix;
 pub(crate) mod point;
+pub(crate) mod point_light;
 pub(crate) mod ray;
 pub(crate) mod shapes;
 pub(crate) mod transformations;
