@@ -4,6 +4,8 @@ use core::{
     ops::{Add, Div, Mul, Sub},
 };
 
+use super::coord::Coord;
+
 #[derive(Debug, Clone)]
 pub struct Vector {
     pub(crate) x: f64,
@@ -31,6 +33,20 @@ impl Vector {
             self.z * rhs.x - self.x * rhs.z,
             self.x * rhs.y - self.y * rhs.x,
         )
+    }
+
+    pub fn joining(from: Coord, to: Coord) -> Self {
+        Vector {
+            x: to.x - from.x,
+            y: to.y - from.y,
+            z: to.z - from.z,
+        }
+    }
+}
+
+impl From<Coord> for Vector {
+    fn from(Coord { x, y, z }: Coord) -> Self {
+        Vector { x, y, z }
     }
 }
 

@@ -3,6 +3,7 @@ use sphere::Sphere;
 
 use crate::{
     intersection::{intersections::IntersectionTracker, single_intersection::SingleIntersection},
+    point::{coord::Coord, vector::Vector},
     ray::Ray,
 };
 
@@ -18,6 +19,10 @@ pub enum Shapes {
 pub trait Hittable {
     /// Return the times when the shape was struck by the ray
     fn hit_times(&self, ray: &Ray) -> Vec<f64>;
+
+    /// Return the vector normal to some coord. It is assumed that the coorindate given is a point
+    /// in the surface of the shape
+    fn normal(&self, at: &Coord) -> Vector;
 }
 
 impl Shapes {

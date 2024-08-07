@@ -1,7 +1,10 @@
 use std::ops::Mul;
 
 use crate::{
-    matrix::square4::Matrix4x4, point::vector::Vector, ray::Ray, shapes::sphere,
+    matrix::square4::Matrix4x4,
+    point::{coord::Coord, vector::Vector},
+    ray::Ray,
+    shapes::sphere,
     transformations::TransformationMatrix,
 };
 
@@ -31,13 +34,22 @@ impl Hittable for Sphere {
         let sqrt = discriminant.sqrt();
         vec![(-b - sqrt) / (2.0 * a), (-b + sqrt) / (2.0 * a)]
     }
+
+    fn normal(&self, at: &Coord) -> Vector {
+        let inverse = self
+            .transformation
+            .inverse()
+            .expect("Could not get inverse of transformation");
+        let at = inverse * at;
+        (inverse.transpose() * Vector::from(at)).normalize()
+    }
 }
 
 #[cfg(test)]
 mod test_hittable_sphere {
     use super::*;
     use crate::point::coord::Coord;
-    use std::vec;
+    use std::{f64::consts, vec};
 
     #[test]
     fn basic_intersection() {
@@ -100,5 +112,29 @@ mod test_hittable_sphere {
         let ray = crate::ray::Ray::from(((0, 0, -5), (0, 0, 1)));
         let hits = sphere.hit_times(&ray);
         assert_eq!(hits, vec![]);
+    }
+
+    #[test]
+    fn normal_translated() {
+        let mut sphere = Sphere::default();
+        sphere.transformation.translate((0, 1, 0));
+        let norm = sphere.normal(&Coord::from((0.0, 1.70711, -0.70711)));
+        assert_eq!(norm, Vector::from((0.0, 0.70711, -0.70711)));
+    }
+
+    #[test]
+    fn normal_rotated_scaled() {
+        let mut sphere = Sphere::default();
+        sphere
+            .transformation
+            .rotate(crate::transformations::Axis::Z, consts::PI / 5.0)
+            .scale((1., 0.5, 1.));
+
+        let norm = sphere.normal(&Coord::from((
+            0.0,
+            (2.0f64.sqrt()) / 2.0,
+            -(2.0f64.sqrt()) / 2.0,
+        )));
+        assert_eq!(norm, Vector::from((0.0, 0.97014, -0.24254)));
     }
 }
